@@ -30,3 +30,17 @@ export type Project = {
   latitude: number;
   longitude: number;
 };
+
+export interface ObservationTilesSettingType {
+  name: string;
+  type: "overlay" | "basemap";
+  url: string;
+  options: {
+    attribution: string;
+    minZoom: number;
+    maxZoom: number;
+    layer_description: string;
+    layer_type: string;
+    control_name?: string;
+  };
+}
