@@ -315,4 +315,24 @@
     height: 90vh;
     width: 100%;
   }
+
+  .project-map-popup {
+    display: flex;
+
+    img {
+      margin-right: 5px;
+    }
+    dl {
+      dt {
+        font-weight: var(--fw-bold);
+        display: inline;
+      }
+      dd {
+        display: inline;
+      }
+    }
+  }
+}
+
+@layer components {
 }

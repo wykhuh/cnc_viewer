@@ -3,6 +3,8 @@ import type { Feature, GeoJsonObject } from "geojson";
 
 import type { Project } from "../../types/app";
 import { addLayerToMap, getMapTiles } from "../../lib/map_utils";
+import { html } from "../../lib/component_utils";
+import { iNatPlacesUrl, iNatProjectsUrl } from "../../data/inat_data";
 
 export function renderMap() {
   let map = L.map("map", {
@@ -41,6 +43,29 @@ export function renderProjectsOnMap(targetProjects: Project[], map: L.Map) {
   let markers: L.Marker[] = [];
   targetProjects.forEach((project) => {
     let marker = renderMarker(project.latitude, project.longitude, map);
+    marker.bindPopup(
+      html`<div class="project-map-popup">
+        <img src="${project.icon}" alt="icon for ${project.title}" />
+        <div>
+          <a href="${iNatProjectsUrl}/${project.slug}">${project.title}</a>
+
+          <dl>
+            <div>
+              <dt>Place:</dt>
+              <dd>
+                &nbsp;<a href="${iNatPlacesUrl}/${project.place_id}"
+                  >${project.place_display_name}</a
+                >
+              </dd>
+            </div>
+            <div>
+              <dt>Species Count:</dt>
+              <dd>&nbsp;${project.species_count}</dd>
+            </div>
+          </dl>
+        </div>
+      </div>`,
+    );
     markers.push(marker);
   });
   return markers;
