@@ -4,7 +4,7 @@ import {
   playIcon,
   rightBigIcon,
 } from "../../assets/icons";
-import { iNatTaxaUrl, siteCC } from "../../data/inat_data";
+import { iNatObservationsUrl, siteCC } from "../../data/inat_data";
 import { createSpinner } from "../../lib/spinner";
 import { pluralize, sampleArray, sleep } from "../../lib/utils";
 import type {
@@ -26,6 +26,8 @@ export function renderCarousel(
   if (!containerEl) return;
   let observations = appStore.speciesObservations;
   if (!observations) return;
+  let project = appStore.project;
+  if (!project) return;
 
   containerEl.innerHTML = "";
   let content = "";
@@ -69,13 +71,17 @@ export function renderCarousel(
       aria-roledescription="carousel item"
       aria-labelledby="carousel-item-${count}__heading"
     >`;
-    content += renderCarouselItem(obs, count);
+    content += renderCarouselItem(obs, count, project);
     content += `</div>`; // class="carousel-item"
   });
   containerEl.innerHTML = content;
 }
 
-function renderCarouselItem(obs: NormalizedSpeciesObservation, count: number) {
+function renderCarouselItem(
+  obs: NormalizedSpeciesObservation,
+  count: number,
+  project: Project,
+) {
   let { taxon, photos } = obs;
 
   // image
@@ -102,11 +108,12 @@ function renderCarouselItem(obs: NormalizedSpeciesObservation, count: number) {
   // details
   content += '<div class="details">';
   content += `<h2 id="carousel-item-${count}__heading">`;
+  let link = `${iNatObservationsUrl}?project_id=${project.id}&taxon_id=${taxon.id}`;
   if (taxon.preferred_common_name) {
-    content += `<span><a href="${iNatTaxaUrl}/${taxon.id}">${taxon.preferred_common_name}</a></span> `;
+    content += `<span><a href="${link}">${taxon.preferred_common_name}</a></span> `;
   }
   if (taxon.name) {
-    content += `(<span><a href="${iNatTaxaUrl}/${taxon.id}">${taxon.name}</a></span>)`;
+    content += `(<span><a href="${link}">${taxon.name}</a></span>)`;
   } else {
     content += "Unknown";
   }
@@ -150,6 +157,10 @@ function renderCarouselItem(obs: NormalizedSpeciesObservation, count: number) {
     }
     content += `</dd>`;
   }
+
+  content += "<div>";
+  content += `<dt>Link:&nbsp;</dt><dd><a href='${iNatObservationsUrl}/${obs.id}'>iNaturalist Observations page</a></dd>`;
+  content += "</div>";
   content += "</dl>";
 
   content += "</div>"; // class="details"
@@ -197,7 +208,7 @@ export async function fetchAndRenderOtherObservations(
 
       if (figureEl && normalizedObs.photos) {
         figureEl.innerHTML = "";
-        let content = renderCarouselItem(normalizedObs, count);
+        let content = renderCarouselItem(normalizedObs, count, project);
         figureEl.innerHTML = content;
       }
       count += 1;
