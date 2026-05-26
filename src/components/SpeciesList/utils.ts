@@ -4,9 +4,9 @@ import {
   playIcon,
   rightBigIcon,
 } from "../../assets/icons";
-import { iNatTaxaUrl } from "../../data/inat_data";
+import { iNatTaxaUrl, siteCC } from "../../data/inat_data";
 import { createSpinner } from "../../lib/spinner";
-import { pluralize, sleep } from "../../lib/utils";
+import { pluralize, sampleArray, sleep } from "../../lib/utils";
 import type {
   AppStoreType,
   NormalizedSpeciesObservation,
@@ -81,9 +81,21 @@ function renderCarouselItem(obs: NormalizedSpeciesObservation, count: number) {
   // image
   let content = "<figure class='media'>";
   if (photos && photos.length > 0) {
-    content += `<img src=${photos[0].url.replace("square", "large")} alt="photo of ${taxon.preferred_common_name}, ${taxon.name}">`;
-  } else {
-    content += `<div class="image-placeholder"><span class="loader"></span></div>`;
+    let photo = photos[0];
+    if (siteCC.includes(photo.license_code)) {
+      if (photo.url) {
+        content += `<img src=${photo.url.replace("square", "large")} alt="photo of ${taxon.preferred_common_name}, ${taxon.name}">`;
+      }
+    } else {
+      content += "<div>";
+      content += `Note: Photo not displayed because photo is `;
+      if (photo.license_code) {
+        content += photo.license_code;
+      } else {
+        content += "all rights reserved";
+      }
+      content += "</div>";
+    }
   }
   content += "</figure>";
 
@@ -103,30 +115,40 @@ function renderCarouselItem(obs: NormalizedSpeciesObservation, count: number) {
   content += `<div>${pluralize(obs.count, "observation")}</div>`;
 
   content += "<dl>";
-  if (obs.user) {
-    content += "<div>";
-    content += `<dt>Observer:&nbsp;</dt><dd>${obs.user.login}</dd>`;
-    content += "</div>";
-  }
-  if (obs.observed_on) {
-    content += "<div>";
-    content += `<dt>Observed date:&nbsp;</dt><dd>${obs.observed_on}</dd>`;
-    content += "</div>";
-  }
-  if (obs.place_guess) {
-    content += "<div>";
-    content += `<dt>Place guess:&nbsp;</dt><dd>${obs.place_guess}</dd>`;
-    content += "</div>";
-  }
-  if (obs.quality_grade) {
-    content += "<div>";
-    content += `<dt>Status:&nbsp;</dt><dd>${obs.quality_grade}</dd>`;
-    content += "</div>";
-  }
-  if (photos && photos.length > 0) {
-    content += "<div>";
-    content += `<dt>Photo:&nbsp;</dt><dd>${photos[0].attribution}</dd>`;
-    content += "</div>";
+  if (siteCC.includes(obs.license_code)) {
+    if (obs.user) {
+      content += "<div>";
+      content += `<dt>Observer:&nbsp;</dt><dd>${obs.user.login}</dd>`;
+      content += "</div>";
+    }
+    if (obs.observed_on) {
+      content += "<div>";
+      content += `<dt>Observed date:&nbsp;</dt><dd>${obs.observed_on}</dd>`;
+      content += "</div>";
+    }
+    if (obs.place_guess) {
+      content += "<div>";
+      content += `<dt>Place guess:&nbsp;</dt><dd>${obs.place_guess}</dd>`;
+      content += "</div>";
+    }
+    if (obs.quality_grade) {
+      content += "<div>";
+      content += `<dt>Status:&nbsp;</dt><dd>${obs.quality_grade}</dd>`;
+      content += "</div>";
+    }
+    if (photos && photos.length > 0) {
+      content += "<div>";
+      content += `<dt>Photo:&nbsp;</dt><dd>${photos[0].attribution}</dd>`;
+      content += "</div>";
+    }
+  } else {
+    content += `<dt>Note:&nbsp;</dt><dd>Observation not displayed because observation is `;
+    if (obs.license_code) {
+      content += obs.license_code;
+    } else {
+      content += "all rights reserved";
+    }
+    content += `</dd>`;
   }
   content += "</dl>";
 
@@ -165,7 +187,7 @@ export async function fetchAndRenderOtherObservations(
     if (data) {
       let normalizedObs = formatNormalizedSpeciesObservation(
         { taxon: obs.taxon, count: obs.count },
-        data[0],
+        data,
       );
 
       // add photos to existing <figure>
@@ -185,21 +207,46 @@ export async function fetchAndRenderOtherObservations(
 
 export function formatNormalizedSpeciesObservation(
   taxon: ObservationsSpeciesBasicResult,
-  observation?: ObservationsBasicResult,
+  observations: ObservationsBasicResult[],
 ): NormalizedSpeciesObservation {
   let data: NormalizedSpeciesObservation = {
     count: taxon.count,
     taxon: taxon.taxon,
   };
-  if (observation) {
-    data.id = observation.id;
-    data.user = observation.user;
-    data.place_guess = observation.place_guess;
-    data.observed_on = observation.observed_on;
-    data.time_observed_at = observation.time_observed_at;
-    data.quality_grade = observation.quality_grade;
-    data.photos = observation.photos;
+  // select observation with allowed CC license
+  let ccObservation = sampleArray(
+    observations.filter((obs) => siteCC.includes(obs.license_code)),
+  );
+  if (ccObservation) {
+    addObservationData(data, ccObservation);
+    // select first observation
+  } else if (observations.length > 0) {
+    addObservationData(data, observations[0]);
   }
 
   return data;
+}
+
+function addObservationData(
+  data: NormalizedSpeciesObservation,
+  observation: ObservationsBasicResult,
+) {
+  data.id = observation.id;
+  data.user = observation.user;
+  data.place_guess = observation.place_guess;
+  data.observed_on = observation.observed_on;
+  data.time_observed_at = observation.time_observed_at;
+  data.quality_grade = observation.quality_grade;
+  data.license_code = observation.license_code;
+
+  // select photo with allowed CC license
+  let ccPhoto = sampleArray(
+    observation.photos.filter((photo) => siteCC.includes(photo.license_code)),
+  );
+  if (ccPhoto) {
+    data.photos = [ccPhoto];
+    // select first photo
+  } else if (observation.photos.length > 0) {
+    data.photos = [observation.photos[0]];
+  }
 }

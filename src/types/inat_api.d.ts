@@ -25,15 +25,16 @@ export type ObservationsBasicResult = {
 export type BasicTaxon = {
   id: number;
   name: string;
-  preferred_common_name: string;
+  preferred_common_name?: string;
   rank: string;
+  default_photo?: BasicPhoto;
 };
 
 export type BasicPhoto = {
   id: number;
   url: string;
   attribution: string;
-  license_code: CCLicense;
+  license_code: CCLicense | null;
 };
 
 export type iNatObservationsSpeciesBasicAPI = {

@@ -9,7 +9,7 @@ import {
   renderProjectsList,
   renderProjectsOnMap,
 } from "./render_utils.ts";
-import { sampleArray } from "../../lib/utils.ts";
+import { fetchProject } from "./data_utils.ts";
 
 class PageHome extends HTMLElement {
   constructor() {
@@ -38,9 +38,7 @@ class PageHome extends HTMLElement {
   async render(appStore: AppStoreType) {
     this.map = renderMap();
 
-    // set project
-    let randomProject = sampleArray(appStore.data.projects);
-    // randomProject = appStore.data.projects.filter((p) => p.id == 270080)[0];
+    let randomProject = fetchProject(appStore);
     appStore.project = randomProject;
 
     // render project

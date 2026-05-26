@@ -4,7 +4,6 @@ import {
   observationPhotoResponse3,
   observationSpecies,
 } from "../../data/inat_api";
-import { siteCC } from "../../data/inat_data";
 import {
   getObservationsBasic,
   getObservationsSpeciesBasic,
@@ -26,8 +25,6 @@ export function getTargetProjects(
 }
 
 const defaultParams = {
-  license: siteCC.join(","),
-  photos: true,
   verifiable: true,
   spam: false,
   // quality_grade: "research",
@@ -46,12 +43,17 @@ export async function fetchObservationBasicForTaxon(
     return obs.results;
   }
 
+  // fetch multiple observations in hopes that one of the observations will have
+  // allowed site CC license, and show different random observations
   let params = {
     ...defaultParams,
     taxon_id: taxon.id,
     project_id: project.id,
-    per_page: 1,
+    per_page: 10,
     order_by: "random",
+    photos: true,
+    // license: siteCC.join(","),
+    // photo_license: siteCC.join(","),
   };
   let paramsString = new URLSearchParams(params as any).toString();
 
@@ -79,4 +81,14 @@ export async function fetchSpecies(project: Project) {
   if (data && data.results.length > 0) {
     return data.results;
   }
+}
+
+export function fetchProject(appStore: AppStoreType) {
+  let randomProject = sampleArray(appStore.data.projects);
+  // 279847 - 3 species are all rights reserved by the same observer
+  // 270080 - 3 species only have 1 all rights obs
+  // 264323 - 1 species common hackberry have CC and all rights observations
+  // randomProject = appStore.data.projects.filter((p) => p.id == 264323)[0];
+
+  return randomProject;
 }

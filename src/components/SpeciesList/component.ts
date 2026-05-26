@@ -131,15 +131,15 @@ class SpeciesList extends HTMLElement {
       appStore.speciesObservations = taxa.map((t, i) => {
         // combine taxa data with observations data for first taxa
         if (i === 0) {
-          return formatNormalizedSpeciesObservation(
-            firstTaxon,
-            observations[0],
-          );
+          return formatNormalizedSpeciesObservation(firstTaxon, observations);
           // use taxa data for rest of the taxa
         } else {
-          return formatNormalizedSpeciesObservation(t);
+          return formatNormalizedSpeciesObservation(t, []);
         }
       });
+    } else {
+      this.innerText = "No records found";
+      return;
     }
 
     renderCarousel(appStore, this);

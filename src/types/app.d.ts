@@ -1,4 +1,4 @@
-import type { BasicPhoto } from "./inat_api";
+import type { BasicPhoto, CCLicense } from "./inat_api";
 
 declare global {
   interface Window {
@@ -63,6 +63,7 @@ export type NormalizedSpeciesObservation = {
   observed_on?: string;
   time_observed_at?: string;
   quality_grade?: string;
+  license_code?: CCLicense | null;
   photos?: BasicPhoto[];
   count: number;
   taxon: BasicTaxon;
