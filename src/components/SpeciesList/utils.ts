@@ -1,4 +1,9 @@
-import { leftBigIcon, playIcon, rightBigIcon } from "../../assets/icons";
+import {
+  expandIcon,
+  leftBigIcon,
+  playIcon,
+  rightBigIcon,
+} from "../../assets/icons";
 import { iNatTaxaUrl } from "../../data/inat_data";
 import { createSpinner } from "../../lib/spinner";
 import { pluralize, sleep } from "../../lib/utils";
@@ -26,6 +31,7 @@ export function renderCarousel(
   let content = "";
   content += `<div role="group" id="carousel-controls" aria-label="carousel controls">`;
   content += `<button id="toggle-animation" aria-label="Start animation" title="Start animation">${playIcon}</button>`;
+  content += "<div id='item-selector'>";
   content += `<button id="prev-selector" aria-label="Previous slide">${leftBigIcon}</button>`;
 
   // button to show/hide carousel item
@@ -47,8 +53,9 @@ export function renderCarousel(
   });
 
   content += `<button id="next-selector" aria-label="Next slide">${rightBigIcon}</button>`;
-  content += `</div>`; // id="carousel-controls"
-
+  content += `</div>`;
+  content += `<button id='fullscreen' aria-label="Fullscrren" title="Fullscreen">${expandIcon}</button>`;
+  content += "</div>"; // id="carousel-controls"
   // container for carousel item
   observations.forEach((obs, i) => {
     let { taxon } = obs;

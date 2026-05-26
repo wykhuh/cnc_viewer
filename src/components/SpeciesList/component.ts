@@ -29,7 +29,7 @@ class SpeciesList extends HTMLElement {
   toggleAnimationEl: HTMLButtonElement | null = null;
   currentIndex = 0;
   timer: any = undefined;
-  looping: boolean = false;
+  fullscreenEl: HTMLButtonElement | null = null;
 
   connectedCallback() {
     setupComponent(template, this);
@@ -44,10 +44,13 @@ class SpeciesList extends HTMLElement {
         this.prevEl = this.querySelector("#prev-selector");
         this.nextEl = this.querySelector("#next-selector");
       }
+      this.fullscreenEl = this.querySelector("#fullscreen");
       this.toggleAnimationEl = this.querySelector("#toggle-animation");
+
       this.prevEl?.addEventListener("click", this);
       this.nextEl?.addEventListener("click", this);
       this.toggleAnimationEl?.addEventListener("click", this);
+      this.fullscreenEl?.addEventListener("click", this);
     });
   }
 
@@ -59,6 +62,7 @@ class SpeciesList extends HTMLElement {
     this.prevEl?.removeEventListener("click", this);
     this.nextEl?.removeEventListener("click", this);
     this.toggleAnimationEl?.removeEventListener("click", this);
+    this.fullscreenEl?.removeEventListener("click", this);
   }
 
   handleEvent(event: Event) {
@@ -97,6 +101,11 @@ class SpeciesList extends HTMLElement {
           this.startAnimation(appStore);
         }
         this.updateAnimationState(appStore);
+      } else if (
+        target.closest("button")?.id === "fullscreen" ||
+        target.id === "fullscreen"
+      ) {
+        this.toggleFullScreen(this);
       }
     }
   }
@@ -146,6 +155,14 @@ class SpeciesList extends HTMLElement {
         project,
         this,
       );
+    }
+  }
+
+  toggleFullScreen(element: HTMLElement) {
+    if (!document.fullscreenElement) {
+      element.requestFullscreen();
+    } else {
+      document.exitFullscreen?.();
     }
   }
 
