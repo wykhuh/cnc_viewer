@@ -2,25 +2,19 @@ import L from "leaflet";
 import type { Feature, GeoJsonObject } from "geojson";
 
 import type { Project } from "../../types/app";
-import { addLayerToMap, getMapTiles } from "../../lib/map_utils";
-import { html } from "../../lib/component_utils";
+import { getMapTiles } from "../../lib/map_utils";
 import { iNatPlacesUrl, iNatProjectsUrl } from "../../data/inat_data";
 
 export function renderMap() {
   let map = L.map("map", {
     center: [0, 0],
-    zoom: 2,
-    maxZoom: 19,
+    zoom: 0,
+    maxZoom: 10,
   });
 
-  const layerControl = L.control
-    .layers(undefined, undefined, { collapsed: true })
-    .addTo(map);
-
   // add basemaps
-  let { OpenStreetMap, OpenTopo } = getMapTiles();
-  addLayerToMap(OpenStreetMap, map, layerControl, true);
-  addLayerToMap(OpenTopo, map, layerControl);
+  let { OpenStreetMap } = getMapTiles();
+  L.tileLayer(OpenStreetMap.url, OpenStreetMap.options).addTo(map);
 
   return map;
 }
@@ -43,12 +37,20 @@ export function renderProjectsOnMap(targetProjects: Project[], map: L.Map) {
   let markers: L.Marker[] = [];
   targetProjects.forEach((project) => {
     let marker = renderMarker(project.latitude, project.longitude, map);
-    marker.bindPopup(
-      html`<div class="project-map-popup">
-        <img src="${project.icon}" alt="icon for ${project.title}" />
-        <div>
-          <a href="${iNatProjectsUrl}/${project.slug}">${project.title}</a>
+    marker.bindPopup(formatProjectDisplay(project, "project-map-popup"));
+    markers.push(marker);
+  });
+  return markers;
+}
 
+function formatProjectDisplay(
+  project: Project,
+  className: string,
+  titleTag = "div",
+) {
+  return `<div class="${className}">
+        <div>
+          <${titleTag}><a href="${iNatProjectsUrl}/${project.id}">${project.title}</a></${titleTag}>
           <dl>
             <div>
               <dt>Place:</dt>
@@ -58,17 +60,9 @@ export function renderProjectsOnMap(targetProjects: Project[], map: L.Map) {
                 >
               </dd>
             </div>
-            <div>
-              <dt>Species Count:</dt>
-              <dd>&nbsp;${project.species_count}</dd>
-            </div>
           </dl>
         </div>
-      </div>`,
-    );
-    markers.push(marker);
-  });
-  return markers;
+      </div>`;
 }
 
 export function renderEcoregions(ecoregions: GeoJsonObject, map: L.Map) {
@@ -91,11 +85,10 @@ export function renderProjectsList(
   if (!containerEl) return;
   containerEl.innerHTML = "";
 
-  let listEl = document.createElement("ul");
   targetProjects.forEach((project) => {
-    let itemEl = document.createElement("li");
-    itemEl.innerText = `${project.place_name}- ${project.latitude}`;
-    listEl.appendChild(itemEl);
+    let itemEl = document.createElement("div");
+    let content = formatProjectDisplay(project, "project-list-item", "h2");
+    itemEl.innerHTML = content;
+    containerEl.appendChild(itemEl);
   });
-  containerEl.appendChild(listEl);
 }

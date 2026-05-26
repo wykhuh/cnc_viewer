@@ -1,3 +1,5 @@
+import type { BasicPhoto } from "./inat_api";
+
 declare global {
   interface Window {
     app: AppStoreType;
@@ -5,7 +7,10 @@ declare global {
 }
 
 export type AppStoreType = {
-  data: { taxa: Taxon[]; projects: Project[] };
+  data: { projects: Project[] };
+  speciesObservations: NormalizedSpeciesObservation[];
+  project?: Project;
+  animation: { looping: boolean };
 };
 
 export type Taxon = {
@@ -16,6 +21,7 @@ export type Taxon = {
   name: string;
   preferred_common_name: string;
   rank: string;
+  photos: BasicPhoto[];
 };
 
 export type Project = {
@@ -44,3 +50,25 @@ export interface ObservationTilesSettingType {
     control_name?: string;
   };
 }
+
+export interface DataComponentType extends HTMLElement {
+  data?: any;
+  type?: string;
+}
+
+export type NormalizedSpeciesObservation = {
+  id?: number;
+  user?: { id: number; login: string };
+  place_guess?: string;
+  observed_on?: string;
+  time_observed_at?: string;
+  quality_grade?: string;
+  photos?: BasicPhoto[];
+  count: number;
+  taxon: BasicTaxon;
+};
+
+type Spinner = {
+  start: () => void;
+  stop: () => void;
+};
