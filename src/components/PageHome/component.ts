@@ -18,25 +18,44 @@ class PageHome extends HTMLElement {
 
   map: L.Map | null = null;
   markers: L.Marker[] = [];
+  newProjectEl: HTMLButtonElement | null = null;
 
   connectedCallback() {
     setupComponent(template, this);
 
     this.render(window.app);
+
+    this.newProjectEl = this.querySelector("#new-project");
+
+    this.newProjectEl?.addEventListener("click", this);
   }
 
-  disconnectedCallback() {}
+  disconnectedCallback() {
+    this.newProjectEl?.addEventListener("click", this);
+  }
 
   // TODO: allow users to set verifiable, quality_grade
   // TODO: allow users to select projects by place
-  // TODO: allow users to select new random project
   handleEvent(event: Event) {
     let target = event.target as HTMLInputElement;
     if (!target) return;
+    if (!this.map) return;
+
+    let appStore = window.app;
+
+    if (event.type === "click") {
+      if (target.id === "new-project") {
+        this.markers.forEach((marker) => marker.remove());
+
+        this.render(appStore);
+      }
+    }
   }
 
   async render(appStore: AppStoreType) {
-    this.map = renderMap();
+    if (!this.map) {
+      this.map = renderMap();
+    }
 
     let randomProject = fetchProject(appStore);
     appStore.project = randomProject;
@@ -48,6 +67,7 @@ class PageHome extends HTMLElement {
     // render species list
     let containerEl = this.querySelector("#data-container");
     if (containerEl) {
+      containerEl.innerHTML = "";
       let speciesEl = document.createElement("species-list");
       containerEl.append(speciesEl);
     }

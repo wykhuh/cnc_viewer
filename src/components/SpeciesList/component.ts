@@ -63,6 +63,8 @@ class SpeciesList extends HTMLElement {
     this.nextEl?.removeEventListener("click", this);
     this.toggleAnimationEl?.removeEventListener("click", this);
     this.fullscreenEl?.removeEventListener("click", this);
+
+    clearInterval(this.timer);
   }
 
   handleEvent(event: Event) {
@@ -127,6 +129,7 @@ class SpeciesList extends HTMLElement {
       project,
     );
 
+    // set store speciesObservations
     if (observations) {
       appStore.speciesObservations = taxa.map((t, i) => {
         // combine taxa data with observations data for first taxa
