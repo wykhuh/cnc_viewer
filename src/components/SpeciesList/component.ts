@@ -1,5 +1,6 @@
 import { pauseIcon, playIcon } from "../../assets/icons";
 import { html, setupComponent } from "../../lib/component_utils";
+import { toggleFullScreen } from "../../lib/utils";
 import type { AppStoreType } from "../../types/app";
 import {
   fetchObservationBasicForTaxon,
@@ -108,7 +109,10 @@ class SpeciesList extends HTMLElement {
         target.closest("button")?.id === "fullscreen" ||
         target.id === "fullscreen"
       ) {
-        this.toggleFullScreen(this);
+        let container = document.querySelector<HTMLElement>("#content");
+        if (container) {
+          toggleFullScreen(container);
+        }
       }
     }
   }
@@ -165,14 +169,6 @@ class SpeciesList extends HTMLElement {
         project,
         this,
       );
-    }
-  }
-
-  toggleFullScreen(element: HTMLElement) {
-    if (!document.fullscreenElement) {
-      element.requestFullscreen();
-    } else {
-      document.exitFullscreen?.();
     }
   }
 

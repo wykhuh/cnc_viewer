@@ -20,3 +20,11 @@ export function pluralize(
     return `${displayNumber} ${text}s`;
   }
 }
+
+export function toggleFullScreen(element: HTMLElement) {
+  if (!document.fullscreenElement) {
+    element.requestFullscreen();
+  } else {
+    document.exitFullscreen?.();
+  }
+}
