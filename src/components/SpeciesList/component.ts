@@ -35,18 +35,19 @@ class SpeciesList extends HTMLElement {
     setupComponent(template, this);
 
     this.render(window.app).then(() => {
-      this.querySelectorAll(".carousel-item-selector").forEach((el) => {
-        el.addEventListener("click", this);
-      });
-
       // updateCarouselState also assigns this.prevEl and this.nextEl
-      if (this.prevEl == null) {
+      if (this.prevEl === null) {
         this.prevEl = this.querySelector("#prev-selector");
         this.nextEl = this.querySelector("#next-selector");
       }
+      if (this.toggleAnimationEl === null) {
+        this.toggleAnimationEl = this.querySelector("#toggle-animation");
+      }
       this.fullscreenEl = this.querySelector("#fullscreen");
-      this.toggleAnimationEl = this.querySelector("#toggle-animation");
 
+      this.querySelectorAll(".carousel-item-selector").forEach((el) => {
+        el.addEventListener("click", this);
+      });
       this.prevEl?.addEventListener("click", this);
       this.nextEl?.addEventListener("click", this);
       this.toggleAnimationEl?.addEventListener("click", this);
@@ -58,7 +59,6 @@ class SpeciesList extends HTMLElement {
     this.querySelectorAll(".carousel-item-selector").forEach((el) => {
       el.removeEventListener("click", this);
     });
-
     this.prevEl?.removeEventListener("click", this);
     this.nextEl?.removeEventListener("click", this);
     this.toggleAnimationEl?.removeEventListener("click", this);
@@ -102,6 +102,7 @@ class SpeciesList extends HTMLElement {
         } else {
           this.startAnimation(appStore);
         }
+        appStore.animation.looping = !appStore.animation.looping;
         this.updateAnimationState(appStore);
       } else if (
         target.closest("button")?.id === "fullscreen" ||
@@ -146,7 +147,13 @@ class SpeciesList extends HTMLElement {
     }
 
     renderCarousel(appStore, this);
-    this.updateCarouselState(appStore);
+
+    if (appStore.mode === "auto_change" && appStore.animation.looping) {
+      this.updateAnimationState(appStore);
+      this.startAnimation(appStore);
+    } else {
+      this.updateCarouselState(appStore);
+    }
 
     // get observations for remaining taxa
     if (appStore.speciesObservations.length > 1) {
@@ -171,14 +178,15 @@ class SpeciesList extends HTMLElement {
 
   startAnimation(appStore: AppStoreType) {
     this.timer = setInterval(() => {
-      // reset index when at end of taxa array
+      // load new project at end of observations
       if (this.currentIndex === appStore.speciesObservations.length - 1) {
-        this.currentIndex = 0;
-        // increment index
-      } else {
-        this.currentIndex += 1;
+        this.stopAnimation();
+        window.dispatchEvent(new Event("loadNewProject"));
+        return;
       }
 
+      // load next observation
+      this.currentIndex += 1;
       setCurrentTaxon(this.currentIndex, this);
       this.updateCarouselState(appStore);
     }, 5000);
@@ -189,24 +197,25 @@ class SpeciesList extends HTMLElement {
   }
 
   updateAnimationState(appStore: AppStoreType) {
+    if (this.toggleAnimationEl === null) {
+      this.toggleAnimationEl = this.querySelector("#toggle-animation");
+    }
     if (!this.toggleAnimationEl) return;
 
     if (appStore.animation.looping) {
-      appStore.animation.looping = false;
-      this.toggleAnimationEl.ariaLabel = "Start animation";
-      this.toggleAnimationEl.title = "Start animation";
-      this.toggleAnimationEl.innerHTML = playIcon;
-    } else {
-      appStore.animation.looping = true;
       this.toggleAnimationEl.ariaLabel = "Stop animation";
       this.toggleAnimationEl.title = "Stop animation";
       this.toggleAnimationEl.innerHTML = pauseIcon;
+    } else {
+      this.toggleAnimationEl.ariaLabel = "Start animation";
+      this.toggleAnimationEl.title = "Start animation";
+      this.toggleAnimationEl.innerHTML = playIcon;
     }
   }
 
   updateCarouselState(appStore: AppStoreType) {
-    // use querySelector for prev and next button
-    if (this.prevEl == null) {
+    // update prev/next
+    if (this.prevEl === null) {
       this.prevEl = this.querySelector("#prev-selector");
       this.nextEl = this.querySelector("#next-selector");
     }
@@ -224,6 +233,7 @@ class SpeciesList extends HTMLElement {
       this.nextEl.disabled = false;
     }
 
+    // update current item
     let oldCurrent = this.querySelector(".carousel-item-selector.current");
     if (oldCurrent) {
       oldCurrent.classList.remove("current");

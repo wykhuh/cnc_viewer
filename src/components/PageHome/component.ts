@@ -28,10 +28,12 @@ class PageHome extends HTMLElement {
     this.newProjectEl = this.querySelector("#new-project");
 
     this.newProjectEl?.addEventListener("click", this);
+    window.addEventListener("loadNewProject", this);
   }
 
   disconnectedCallback() {
-    this.newProjectEl?.addEventListener("click", this);
+    this.newProjectEl?.removeEventListener("click", this);
+    window.removeEventListener("loadNewProject", this);
   }
 
   // TODO: allow users to set verifiable, quality_grade
@@ -49,6 +51,12 @@ class PageHome extends HTMLElement {
 
         this.render(appStore);
       }
+    }
+
+    if (event.type === "loadNewProject") {
+      this.markers.forEach((marker) => marker.remove());
+
+      this.render(appStore);
     }
   }
 

@@ -11,7 +11,10 @@ export type AppStoreType = {
   speciesObservations: NormalizedSpeciesObservation[];
   project?: Project;
   animation: { looping: boolean };
+  mode: ProjectMode;
 };
+
+export type ProjectMode = "auto_change";
 
 export type Taxon = {
   project_id: number;
