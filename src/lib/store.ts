@@ -5,6 +5,7 @@ const store: AppStoreType = {
   speciesObservations: [],
   animation: { looping: false },
   mode: "auto_change",
+  fullscreen: false,
 };
 
 const proxiedStore = new Proxy(structuredClone(store), {

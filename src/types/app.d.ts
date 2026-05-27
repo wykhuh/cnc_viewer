@@ -12,6 +12,7 @@ export type AppStoreType = {
   project?: Project;
   animation: { looping: boolean };
   mode: ProjectMode;
+  fullscreen: boolean;
 };
 
 export type ProjectMode = "auto_change";

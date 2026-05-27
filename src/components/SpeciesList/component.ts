@@ -109,6 +109,7 @@ class SpeciesList extends HTMLElement {
         target.closest("button")?.id === "fullscreen" ||
         target.id === "fullscreen"
       ) {
+        appStore.fullscreen = !appStore.fullscreen;
         let container = document.querySelector<HTMLElement>("#content");
         if (container) {
           toggleFullScreen(container);
@@ -120,6 +121,14 @@ class SpeciesList extends HTMLElement {
   async render(appStore: AppStoreType) {
     let project = appStore.project;
     if (!project) return;
+
+    // make fullscrren
+    if (appStore.fullscreen) {
+      let container = document.querySelector<HTMLElement>("#content");
+      if (container) {
+        container.requestFullscreen();
+      }
+    }
 
     // get list of taxa
     let taxa = await fetchSpecies(project);
