@@ -10,6 +10,7 @@ import {
   renderProjectsOnMap,
 } from "./render_utils.ts";
 import { selectRandomProject } from "./data_utils.ts";
+import { updateAppUrl } from "../../lib/url_utils.ts";
 
 class PageHome extends HTMLElement {
   constructor() {
@@ -49,7 +50,7 @@ class PageHome extends HTMLElement {
       if (target.id === "new-project") {
         this.markers.forEach((marker) => marker.remove());
         appStore.project = selectRandomProject(appStore);
-
+        updateAppUrl(window.location, appStore);
         this.render(appStore);
       }
     }
@@ -57,7 +58,7 @@ class PageHome extends HTMLElement {
     if (event.type === "loadNewProject") {
       this.markers.forEach((marker) => marker.remove());
       appStore.project = selectRandomProject(appStore);
-
+      updateAppUrl(window.location, appStore);
       this.render(appStore);
     }
   }

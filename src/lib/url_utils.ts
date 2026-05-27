@@ -1,4 +1,4 @@
-import type { ValidAppParams } from "../types/app";
+import type { AppStoreType, ValidAppParams } from "../types/app";
 
 export function decodeAppUrl(searchParams: string) {
   const urlParams = new URLSearchParams(searchParams);
@@ -11,3 +11,26 @@ export function decodeAppUrl(searchParams: string) {
   return params;
 }
 
+export function formatAppParams(appStore: AppStoreType) {
+  let params = new URLSearchParams();
+
+  if (appStore.project) {
+    params.set("project_id", appStore.project.slug);
+  }
+
+  return params.toString();
+}
+
+export function updateAppUrl(url_location: Location, appStore: AppStoreType) {
+  let url = `${url_location.origin}${url_location.pathname}`;
+  let params = formatAppParams(appStore);
+  let path = url;
+  if (params) {
+    path += `?${params}`;
+  }
+
+  let state = {
+    path,
+  };
+  window.history.pushState(state, "", path);
+}

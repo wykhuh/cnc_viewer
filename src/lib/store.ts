@@ -1,6 +1,6 @@
 import type { AppStoreType } from "../types/app";
 
-const store: AppStoreType = {
+export const defaultStore: AppStoreType = {
   data: { projects: [] },
   speciesObservations: [],
   animation: { looping: false },
@@ -8,7 +8,7 @@ const store: AppStoreType = {
   fullscreen: false,
 };
 
-const proxiedStore = new Proxy(structuredClone(store), {
+const proxiedStore = new Proxy(structuredClone(defaultStore), {
   set(target, property, value) {
     (target as any)[property] = value;
 

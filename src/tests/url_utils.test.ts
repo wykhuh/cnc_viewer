@@ -1,5 +1,7 @@
 import { expect, test, describe } from "vitest";
-import { decodeAppUrl } from "../lib/url_utils";
+import { decodeAppUrl, formatAppParams } from "../lib/url_utils";
+import { defaultStore } from "../lib/store";
+import { projectDemo } from "./test_helpers";
 
 describe("decodeAppUrl", () => {
   test("returns empty object if no search params", () => {
@@ -24,5 +26,24 @@ describe("decodeAppUrl", () => {
     let results = decodeAppUrl("?foo=1");
 
     expect(results).toStrictEqual({});
+  });
+});
+
+describe("formatAppParams", () => {
+  test("return empty string for default store", () => {
+    let store = structuredClone(defaultStore);
+
+    let result = formatAppParams(store);
+
+    expect(result).toBe("");
+  });
+
+  test("returns project_id if store has project", () => {
+    let store = structuredClone(defaultStore);
+    store.project = projectDemo;
+
+    let result = formatAppParams(store);
+
+    expect(result).toBe(`project_id=${projectDemo.slug}`);
   });
 });
