@@ -37,8 +37,6 @@ class PageHome extends HTMLElement {
     window.removeEventListener("loadNewProject", this);
   }
 
-  // TODO: allow users to set verifiable, quality_grade
-  // TODO: allow users to select projects by place
   handleEvent(event: Event) {
     let target = event.target as HTMLInputElement;
     if (!target) return;

@@ -123,32 +123,39 @@ function renderCarouselItem(
 
   content += "<dl>";
   if (siteCC.includes(obs.license_code)) {
+    content += "<div>";
+    content += `<dt>Observed:&nbsp;</dt>`;
+    content += "<dd>";
     if (obs.user) {
-      content += "<div>";
-      content += `<dt>Observer:&nbsp;</dt><dd>${obs.user.login}</dd>`;
-      content += "</div>";
+      content += `${obs.user.login}, `;
     }
     if (obs.observed_on) {
-      content += "<div>";
-      content += `<dt>Observed date:&nbsp;</dt><dd>${obs.observed_on}</dd>`;
-      content += "</div>";
+      content += `${obs.observed_on}`;
     }
-    if (obs.place_guess) {
-      content += "<div>";
-      content += `<dt>Place guess:&nbsp;</dt><dd>${obs.place_guess}</dd>`;
-      content += "</div>";
-    }
-    if (obs.quality_grade) {
-      content += "<div>";
-      content += `<dt>Status:&nbsp;</dt><dd>${obs.quality_grade}</dd>`;
-      content += "</div>";
-    }
+    content += "</dd>";
+    content += "</div>";
     if (photos && photos.length > 0) {
       content += "<div>";
       content += `<dt>Photo:&nbsp;</dt><dd>${photos[0].attribution}</dd>`;
       content += "</div>";
     }
+
+    if (obs.place_guess) {
+      content += "<div>";
+      content += `<dt>Place guess:&nbsp;</dt><dd>${obs.place_guess}</dd>`;
+      content += "</div>";
+    }
+
+    content += "<div>";
+    content += `<dt>Status:&nbsp;</dt>`;
+    content += "<dd>";
+    if (obs.quality_grade) {
+      content += `${obs.quality_grade} <a href='${iNatObservationsUrl}/${obs.id}'>Observation Link</a>`;
+    }
+    content += "</dd>";
+    content += "</div>";
   } else {
+    content += "<div>";
     content += `<dt>Note:&nbsp;</dt><dd>Observation not displayed because observation is `;
     if (obs.license_code) {
       content += obs.license_code;
@@ -156,11 +163,13 @@ function renderCarouselItem(
       content += "all rights reserved";
     }
     content += `</dd>`;
+    content += "</div>";
+
+    content += "<div>";
+    content += `<dt>Link:&nbsp;</dt><dd><a href='${iNatObservationsUrl}/${obs.id}'>Observation Link</a></dd>`;
+    content += "</div>";
   }
 
-  content += "<div>";
-  content += `<dt>Link:&nbsp;</dt><dd><a href='${iNatObservationsUrl}/${obs.id}'>iNaturalist Observations page</a></dd>`;
-  content += "</div>";
   content += "</dl>";
 
   content += "</div>"; // class="details"
