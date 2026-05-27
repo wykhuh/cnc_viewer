@@ -85,10 +85,12 @@ export async function fetchSpecies(project: Project) {
 
 export function fetchProject(appStore: AppStoreType) {
   let randomProject = sampleArray(appStore.data.projects);
+  // 279618 - 8 species all rights reserved by two observers
   // 279847 - 3 species are all rights reserved by the same observer
   // 270080 - 3 species only have 1 all rights obs
   // 264323 - 1 species common hackberry have CC and all rights observations
-  // randomProject = appStore.data.projects.filter((p) => p.id == 264323)[0];
+  // 266374 - painted turtle, observation ok, photo ND
+  // randomProject = appStore.data.projects.filter((p) => p.id == 266374)[0];
 
   return randomProject;
 }

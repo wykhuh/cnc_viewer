@@ -224,14 +224,41 @@ export function formatNormalizedSpeciesObservation(
     count: taxon.count,
     taxon: taxon.taxon,
   };
-  // select observation with allowed CC license
+  // select observation with allowed CC observation and photo
+  let ccObservationPhoto = sampleArray(
+    observations.filter(
+      (obs) =>
+        siteCC.includes(obs.license_code) &&
+        obs.photos.some((photo) => siteCC.includes(photo.license_code)),
+    ),
+  );
+  if (ccObservationPhoto) {
+    addObservationData(data, ccObservationPhoto);
+    return data;
+  }
+
+  // select observation with allowed CC photo
+  let ccPhoto = sampleArray(
+    observations.filter((obs) =>
+      obs.photos.some((photo) => siteCC.includes(photo.license_code)),
+    ),
+  );
+  if (ccPhoto) {
+    addObservationData(data, ccPhoto);
+    return data;
+  }
+
+  // select observation with allowed CC observation
   let ccObservation = sampleArray(
     observations.filter((obs) => siteCC.includes(obs.license_code)),
   );
   if (ccObservation) {
     addObservationData(data, ccObservation);
-    // select first observation
-  } else if (observations.length > 0) {
+    return data;
+  }
+
+  // select first observation
+  if (observations.length > 0) {
     addObservationData(data, observations[0]);
   }
 

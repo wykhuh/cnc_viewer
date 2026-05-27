@@ -291,4 +291,75 @@ describe("formatNormalizedSpeciesObservation", () => {
     };
     expect(results).toStrictEqual(expected);
   });
+
+  test("select observation with allowed observation and photo CC license", () => {
+    let observations: ObservationsBasicResult[] = [
+      { ...ccObservation, photos: [ndPhoto] },
+      { ...ccObservation, photos: [allRightsReservedPhoto] },
+      { ...ccObservation, photos: [ccPhoto] },
+    ];
+
+    let results = formatNormalizedSpeciesObservation(taxon, observations);
+
+    let expected = {
+      ...expectedResult,
+      id: ccObservation.id,
+      license_code: ccObservation.license_code,
+      photos: [ccPhoto],
+    };
+    expect(results).toStrictEqual(expected);
+  });
+
+  test("select observation with allowed photo CC license", () => {
+    let observations: ObservationsBasicResult[] = [
+      { ...ccObservation, photos: [ndPhoto] },
+      { ...ccObservation, photos: [allRightsReservedPhoto] },
+      { ...ndObservation, photos: [ccPhoto] },
+    ];
+
+    let results = formatNormalizedSpeciesObservation(taxon, observations);
+
+    let expected = {
+      ...expectedResult,
+      id: ndObservation.id,
+      license_code: ndObservation.license_code,
+      photos: [ccPhoto],
+    };
+    expect(results).toStrictEqual(expected);
+  });
+
+  test("select observation with allowed observation CC license", () => {
+    let observations: ObservationsBasicResult[] = [
+      { ...allRightsReservedObservation, photos: [ndPhoto] },
+      { ...ndObservation, photos: [allRightsReservedPhoto] },
+      { ...ccObservation, photos: [ndPhoto] },
+    ];
+
+    let results = formatNormalizedSpeciesObservation(taxon, observations);
+
+    let expected = {
+      ...expectedResult,
+      id: ccObservation.id,
+      license_code: ccObservation.license_code,
+      photos: [ndPhoto],
+    };
+    expect(results).toStrictEqual(expected);
+  });
+
+  test("select first observation with invalid observation & photo CC license", () => {
+    let observations: ObservationsBasicResult[] = [
+      { ...allRightsReservedObservation, photos: [ndPhoto] },
+      { ...ndObservation, photos: [allRightsReservedPhoto] },
+    ];
+
+    let results = formatNormalizedSpeciesObservation(taxon, observations);
+
+    let expected = {
+      ...expectedResult,
+      id: allRightsReservedObservation.id,
+      license_code: allRightsReservedObservation.license_code,
+      photos: [ndPhoto],
+    };
+    expect(results).toStrictEqual(expected);
+  });
 });
