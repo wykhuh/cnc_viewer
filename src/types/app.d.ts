@@ -77,3 +77,7 @@ type Spinner = {
   start: () => void;
   stop: () => void;
 };
+
+export type ValidAppParams = {
+  project_id?: string;
+};

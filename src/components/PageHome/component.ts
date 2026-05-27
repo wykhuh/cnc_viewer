@@ -9,7 +9,7 @@ import {
   renderProjectsList,
   renderProjectsOnMap,
 } from "./render_utils.ts";
-import { fetchProject } from "./data_utils.ts";
+import { selectRandomProject } from "./data_utils.ts";
 
 class PageHome extends HTMLElement {
   constructor() {
@@ -48,6 +48,7 @@ class PageHome extends HTMLElement {
     if (event.type === "click") {
       if (target.id === "new-project") {
         this.markers.forEach((marker) => marker.remove());
+        appStore.project = selectRandomProject(appStore);
 
         this.render(appStore);
       }
@@ -55,22 +56,22 @@ class PageHome extends HTMLElement {
 
     if (event.type === "loadNewProject") {
       this.markers.forEach((marker) => marker.remove());
+      appStore.project = selectRandomProject(appStore);
 
       this.render(appStore);
     }
   }
 
   async render(appStore: AppStoreType) {
+    if (!appStore.project) return;
+
     if (!this.map) {
       this.map = renderMap();
     }
 
-    let randomProject = fetchProject(appStore);
-    appStore.project = randomProject;
-
     // render project
-    this.markers = renderProjectsOnMap([randomProject], this.map);
-    renderProjectsList([randomProject], this);
+    this.markers = renderProjectsOnMap([appStore.project], this.map);
+    renderProjectsList([appStore.project], this);
 
     // render species list
     let containerEl = this.querySelector("#data-container");

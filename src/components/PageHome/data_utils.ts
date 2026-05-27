@@ -83,7 +83,7 @@ export async function fetchSpecies(project: Project) {
   }
 }
 
-export function fetchProject(appStore: AppStoreType) {
+export function selectRandomProject(appStore: AppStoreType) {
   let randomProject = sampleArray(appStore.data.projects);
   // 279618 - 8 species all rights reserved by two observers
   // 279847 - 3 species are all rights reserved by the same observer
@@ -93,4 +93,8 @@ export function fetchProject(appStore: AppStoreType) {
   // randomProject = appStore.data.projects.filter((p) => p.id == 266374)[0];
 
   return randomProject;
+}
+
+export function selectProjectById(id: number | string, appStore: AppStoreType) {
+  return appStore.data.projects.find((p) => p.slug === id || p.id === id);
 }
