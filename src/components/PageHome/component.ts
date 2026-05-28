@@ -11,6 +11,7 @@ import {
 } from "./render_utils.ts";
 import { selectRandomProject } from "./data_utils.ts";
 import { updateAppUrl } from "../../lib/url_utils.ts";
+import { throttledFetch } from "../../lib/utils.ts";
 
 class PageHome extends HTMLElement {
   constructor() {
@@ -46,18 +47,12 @@ class PageHome extends HTMLElement {
 
     if (event.type === "click") {
       if (target.id === "new-project") {
-        this.markers.forEach((marker) => marker.remove());
-        appStore.project = selectRandomProject(appStore);
-        updateAppUrl(window.location, appStore);
-        this.render(appStore);
+        this.newProjectHandler(appStore);
       }
     }
 
     if (event.type === "loadNewProject") {
-      this.markers.forEach((marker) => marker.remove());
-      appStore.project = selectRandomProject(appStore);
-      updateAppUrl(window.location, appStore);
-      this.render(appStore);
+      this.newProjectHandler(appStore);
     }
   }
 
@@ -79,6 +74,18 @@ class PageHome extends HTMLElement {
       let speciesEl = document.createElement("species-list");
       containerEl.append(speciesEl);
     }
+  }
+
+  newProjectHandler(appStore: AppStoreType) {
+    // cancel existing fetch observations for previous project
+    throttledFetch.cancel();
+    // pick new project
+    appStore.project = selectRandomProject(appStore);
+    // update url
+    updateAppUrl(window.location, appStore);
+    // update UI
+    this.markers.forEach((marker) => marker.remove());
+    this.render(appStore);
   }
 }
 

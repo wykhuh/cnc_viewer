@@ -6,7 +6,7 @@ import {
 } from "../../assets/icons";
 import { iNatObservationsUrl, siteCC } from "../../data/inat_data";
 import { createSpinner } from "../../lib/spinner";
-import { pluralize, sampleArray, sleep } from "../../lib/utils";
+import { pluralize, sampleArray } from "../../lib/utils";
 import type {
   AppStoreType,
   NormalizedSpeciesObservation,
@@ -202,7 +202,6 @@ export async function fetchAndRenderOtherObservations(
   spinner.start();
 
   for await (let obs of observations) {
-    await sleep(1);
     let data = await fetchObservationBasicForTaxon(obs.taxon, project);
     if (data) {
       let normalizedObs = formatNormalizedSpeciesObservation(

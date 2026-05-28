@@ -28,3 +28,46 @@ export function toggleFullScreen(element: HTMLElement) {
     document.exitFullscreen?.();
   }
 }
+
+function throttleAsync(func: (...args: any[]) => {}, delayMS: number) {
+  let lastRun = 0;
+  let timeouts: any[] = [];
+
+  // @ts-ignore
+  async function throttled(...args) {
+    const currentWait = lastRun + delayMS - Date.now();
+    const shouldRun = currentWait <= 0;
+
+    if (shouldRun) {
+      lastRun = Date.now();
+      try {
+        return await func(...args);
+      } catch (error) {
+        return await new Promise(function (_resolve, reject) {
+          reject(error);
+        });
+      }
+    } else {
+      return await new Promise(function (resolve) {
+        let timeout = setTimeout(function () {
+          resolve(throttled(...args));
+        }, currentWait);
+        timeouts.push(timeout);
+      });
+    }
+  }
+
+  throttled.cancel = function () {
+    timeouts.forEach((timeout) => {
+      clearTimeout(timeout);
+    });
+    timeouts = [];
+  };
+
+  return throttled;
+}
+
+const apiThrottleTime = 1000;
+export const throttledFetch = throttleAsync((url) => {
+  return fetch(url);
+}, apiThrottleTime);

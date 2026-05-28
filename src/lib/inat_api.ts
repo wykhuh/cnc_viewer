@@ -3,6 +3,7 @@ import type {
   iNatObservationsSpeciesBasicAPI,
 } from "../types/inat_api.d.ts";
 import { loggerUrl } from "./logger.ts";
+import { throttledFetch } from "./utils.ts";
 
 export const api_base = "https://api.inaturalist.org/v1/";
 const search_api = "https://api.inaturalist.org/v1/search";
@@ -16,7 +17,7 @@ const observations_api_v2 = "https://api.inaturalist.org/v2/observations";
 
 export async function inatFetch(url: string, funcName: string) {
   try {
-    let resp = await fetch(url);
+    let resp = (await throttledFetch(url)) as Response;
     if (resp.status !== 200) {
       let json = await resp.json();
       let message = "";
