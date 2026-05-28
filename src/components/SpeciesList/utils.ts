@@ -103,6 +103,8 @@ function renderCarouselItem(
       }
       content += "</div>";
     }
+  } else {
+    content += "<span class='loader obs-loader'></span>";
   }
   content += "</figure>";
 
@@ -155,7 +157,7 @@ function renderCarouselItem(
     }
     content += "</dd>";
     content += "</div>";
-  } else {
+  } else if (obs.id) {
     content += "<div>";
     content += `<dt>Note:&nbsp;</dt><dd>Observation not displayed because observation is `;
     if (obs.license_code) {
@@ -199,7 +201,7 @@ export async function fetchAndRenderOtherObservations(
   compontentCtx: HTMLElement,
 ) {
   let count = 2;
-  let spinner = createSpinner();
+  let spinner = createSpinner(".obs-loader");
   spinner.start();
 
   for await (let obs of observations) {
