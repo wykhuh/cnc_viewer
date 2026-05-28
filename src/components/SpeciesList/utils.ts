@@ -5,6 +5,7 @@ import {
   rightBigIcon,
 } from "../../assets/icons";
 import { iNatObservationsUrl, siteCC } from "../../data/inat_data";
+import { renderQualityGrade } from "../../lib/render_utils";
 import { createSpinner } from "../../lib/spinner";
 import { pluralize, sampleArray } from "../../lib/utils";
 import type {
@@ -150,7 +151,7 @@ function renderCarouselItem(
     content += `<dt>Status:&nbsp;</dt>`;
     content += "<dd>";
     if (obs.quality_grade) {
-      content += `${obs.quality_grade} <a href='${iNatObservationsUrl}/${obs.id}'>Observation Link</a>`;
+      content += `${renderQualityGrade(obs.quality_grade)} <a href='${iNatObservationsUrl}/${obs.id}'>Observation Link</a>`;
     }
     content += "</dd>";
     content += "</div>";

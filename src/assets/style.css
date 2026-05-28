@@ -519,4 +519,27 @@
       gap: 0.5rem;
     }
   }
+
+  .quality-grade {
+    margin-top: 0.5rem;
+
+    .badge {
+      padding: 3px;
+      font-size: var(--font-size-sm);
+      white-space: nowrap;
+    }
+
+    .research-grade-badge {
+      background-color: var(--clr-iNat-green);
+      color: var(--clr-white);
+    }
+
+    .needs-id-badge {
+      background-color: var(--clr-iNat-yellow);
+    }
+
+    .casual-badge {
+      background-color: var(--clr-warning);
+    }
+  }
 }

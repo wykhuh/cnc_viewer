@@ -30,4 +30,3 @@ updateAppUrl(window.location, window.app.store);
 // TODO: allow users to set verifiable, quality_grade
 // TODO: allow users to select projects by place
 // TODO: add other years
-// TODO: add badge for quality grade
