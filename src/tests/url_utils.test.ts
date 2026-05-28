@@ -46,4 +46,14 @@ describe("formatAppParams", () => {
 
     expect(result).toBe(`project_id=${projectDemo.slug}`);
   });
+
+  test("returns undefined if page is about", () => {
+    let store = structuredClone(defaultStore);
+    store.page = "about";
+    store.project = projectDemo;
+
+    let result = formatAppParams(store);
+
+    expect(result).toBe(undefined);
+  });
 });

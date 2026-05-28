@@ -12,6 +12,8 @@ export function decodeAppUrl(searchParams: string) {
 }
 
 export function formatAppParams(appStore: AppStoreType) {
+  if (appStore.page !== "home") return;
+
   let params = new URLSearchParams();
 
   if (appStore.project) {
@@ -24,13 +26,7 @@ export function formatAppParams(appStore: AppStoreType) {
 export function updateAppUrl(url_location: Location, appStore: AppStoreType) {
   let url = `${url_location.origin}${url_location.pathname}`;
   let params = formatAppParams(appStore);
-  let path = url;
   if (params) {
-    path += `?${params}`;
+    url += `?${params}`;
   }
-
-  let state = {
-    path,
-  };
-  window.history.pushState(state, "", path);
 }

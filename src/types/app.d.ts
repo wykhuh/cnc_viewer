@@ -2,7 +2,7 @@ import type { BasicPhoto, CCLicense } from "./inat_api";
 
 declare global {
   interface Window {
-    app: AppStoreType;
+    app: { store: AppStoreType; router: RouterType };
   }
 }
 
@@ -13,8 +13,10 @@ export type AppStoreType = {
   animation: { looping: boolean };
   mode: ProjectMode;
   fullscreen: boolean;
+  page: AppPage;
 };
 
+export type AppPage = "home" | "about";
 export type ProjectMode = "auto_change";
 
 export type Taxon = {
@@ -80,4 +82,9 @@ type Spinner = {
 
 export type ValidAppParams = {
   project_id?: string;
+};
+
+type RouterType = {
+  init: () => void;
+  go: (path: string) => void;
 };

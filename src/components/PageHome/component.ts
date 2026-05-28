@@ -24,7 +24,7 @@ class PageHome extends HTMLElement {
   connectedCallback() {
     setupComponent(template, this);
 
-    this.render(window.app);
+    this.render(window.app.store);
 
     this.newProjectEl = this.querySelector("#new-project");
 
@@ -42,7 +42,7 @@ class PageHome extends HTMLElement {
     if (!target) return;
     if (!this.map) return;
 
-    let appStore = window.app;
+    let appStore = window.app.store;
 
     if (event.type === "click") {
       if (target.id === "new-project") {

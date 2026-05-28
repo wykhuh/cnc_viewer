@@ -35,7 +35,7 @@ class SpeciesList extends HTMLElement {
   connectedCallback() {
     setupComponent(template, this);
 
-    this.render(window.app).then(() => {
+    this.render(window.app.store).then(() => {
       // updateCarouselState also assigns this.prevEl and this.nextEl
       if (this.prevEl === null) {
         this.prevEl = this.querySelector("#prev-selector");
@@ -71,7 +71,7 @@ class SpeciesList extends HTMLElement {
   handleEvent(event: Event) {
     let target = event.target as HTMLInputElement;
     if (!target) return;
-    let appStore = window.app;
+    let appStore = window.app.store;
 
     if (event.type === "click") {
       if (target.className === "carousel-item-selector") {

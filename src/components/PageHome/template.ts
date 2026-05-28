@@ -1,11 +1,8 @@
 import { html } from "../../lib/component_utils";
 
 export const template = html`
+  <app-header></app-header>
   <main>
-    <section class="hero">
-      <h1>City Nature Challenge Viewer</h1>
-      <p>Top observed species for each CNC project.</p>
-    </section>
     <div id="content">
       <div id="side">
         <div id="map"></div>
