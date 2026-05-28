@@ -1,5 +1,5 @@
 import { getAppPage } from "../../lib/init_app";
-import { formatAppParams } from "../../lib/url_utils";
+import { formatAppParams, updatePushState } from "../../lib/url_utils";
 import type { AppStoreType, RouterType } from "../../types/app";
 
 export async function pageChangeHandler(
@@ -20,5 +20,6 @@ export async function pageChangeHandler(
   if (params) {
     url += `?${params}`;
   }
+  updatePushState(path, url, appStore);
   router.go(path);
 }

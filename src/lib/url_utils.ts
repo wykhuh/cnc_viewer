@@ -29,4 +29,17 @@ export function updateAppUrl(url_location: Location, appStore: AppStoreType) {
   if (params) {
     url += `?${params}`;
   }
+  updatePushState(url_location.pathname, url, appStore);
+}
+
+export function updatePushState(
+  pathname: string,
+  url: string,
+  appStore: AppStoreType,
+) {
+  let state = {
+    pathname,
+    project_id: appStore.project?.id,
+  };
+  window.history.pushState(state, "", url);
 }

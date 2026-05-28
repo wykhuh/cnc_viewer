@@ -2,11 +2,6 @@ import type { RouterType } from "../types/app";
 
 const Router: RouterType = {
   init: () => {
-    // Event Handler for URL changes
-    window.addEventListener("popstate", (event) => {
-      Router.go(event.state.pathname);
-    });
-
     Router.go(window.location.pathname);
   },
   go: (path: string) => {
