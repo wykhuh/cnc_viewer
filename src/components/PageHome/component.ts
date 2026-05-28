@@ -5,13 +5,15 @@ import { setupComponent } from "../../lib/component_utils";
 import type { AppStoreType } from "../../types/app";
 import { template } from "./template";
 import {
+  initFilters,
   renderMap,
   renderProjectsList,
   renderProjectsOnMap,
 } from "./render_utils.ts";
-import { selectRandomProject } from "./data_utils.ts";
+import { loadProjectsCsv, selectRandomProject } from "./data_utils.ts";
 import { updateAppUrl } from "../../lib/url_utils.ts";
 import { throttledFetch } from "../../lib/utils.ts";
+import { createSpinner } from "../../lib/spinner.ts";
 
 class PageHome extends HTMLElement {
   constructor() {
@@ -21,6 +23,7 @@ class PageHome extends HTMLElement {
   map: L.Map | null = null;
   markers: L.Marker[] = [];
   newProjectEl: HTMLButtonElement | null = null;
+  yearSelectEl: HTMLSelectElement | null = null;
 
   connectedCallback() {
     setupComponent(template, this);
@@ -28,13 +31,16 @@ class PageHome extends HTMLElement {
     this.render(window.app.store);
 
     this.newProjectEl = this.querySelector("#new-project");
+    this.yearSelectEl = this.querySelector("#year-select");
 
     this.newProjectEl?.addEventListener("click", this);
+    this.yearSelectEl?.addEventListener("change", this);
     window.addEventListener("loadNewProject", this);
   }
 
   disconnectedCallback() {
     this.newProjectEl?.removeEventListener("click", this);
+    this.yearSelectEl?.removeEventListener("change", this);
     window.removeEventListener("loadNewProject", this);
   }
 
@@ -54,6 +60,19 @@ class PageHome extends HTMLElement {
     if (event.type === "loadNewProject") {
       this.newProjectHandler(appStore);
     }
+
+    if (event.type === "change") {
+      if (target.id === "year-select") {
+        let spinner = createSpinner(".project-loader");
+        spinner.start();
+        let year = Number(target.value);
+        appStore.year = year;
+        loadProjectsCsv(year, appStore).then(() => {
+          this.newProjectHandler(appStore);
+          spinner.stop();
+        });
+      }
+    }
   }
 
   async render(appStore: AppStoreType) {
@@ -67,6 +86,7 @@ class PageHome extends HTMLElement {
     this.markers = renderProjectsOnMap([appStore.project], this.map);
     renderProjectsList([appStore.project], this);
 
+    initFilters(appStore, this);
     // render species list
     let containerEl = this.querySelector("#data-container");
     if (containerEl) {

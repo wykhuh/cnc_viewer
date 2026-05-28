@@ -1,7 +1,7 @@
 import L from "leaflet";
 import type { Feature, GeoJsonObject } from "geojson";
 
-import type { Project } from "../../types/app";
+import type { AppStoreType, Project } from "../../types/app";
 import { getMapTiles } from "../../lib/map_utils";
 import { iNatPlacesUrl, iNatProjectsUrl } from "../../data/inat_data";
 
@@ -91,4 +91,11 @@ export function renderProjectsList(
     itemEl.innerHTML = content;
     containerEl.appendChild(itemEl);
   });
+}
+
+export function initFilters(appStore: AppStoreType, componentCtx: any) {
+  let optionEl = componentCtx.querySelector(`option[value="${appStore.year}"]`);
+  if (optionEl) {
+    optionEl.selected = true;
+  }
 }

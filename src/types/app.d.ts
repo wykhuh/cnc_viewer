@@ -14,6 +14,7 @@ export type AppStoreType = {
   mode: ProjectMode;
   fullscreen: boolean;
   page: AppPage;
+  year: number;
 };
 
 export type AppPage = "home" | "about";

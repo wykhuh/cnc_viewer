@@ -4,6 +4,7 @@ import {
   observationPhotoResponse3,
   observationSpecies,
 } from "../../data/inat_api";
+import { getAndParseCSV } from "../../lib/csv_utils";
 import {
   getObservationsBasic,
   getObservationsSpeciesBasic,
@@ -90,6 +91,7 @@ export function selectRandomProject(appStore: AppStoreType) {
   // 270080 - 3 species only have 1 all rights obs
   // 264323 - 1 species common hackberry have CC and all rights observations
   // 266374 - painted turtle, observation ok, photo ND
+  // 242086 - 7 species all rights reserved by one observer
   // randomProject = appStore.data.projects.filter((p) => p.id == 266374)[0];
 
   return randomProject;
@@ -97,4 +99,11 @@ export function selectRandomProject(appStore: AppStoreType) {
 
 export function selectProjectById(id: number | string, appStore: AppStoreType) {
   return appStore.data.projects.find((p) => p.slug === id || p.id === id);
+}
+
+export async function loadProjectsCsv(year = 2026, appStore: AppStoreType) {
+  let projects = (await getAndParseCSV(
+    `/data/cnc_${year}_projects_app.csv`,
+  )) as Project[];
+  appStore.data.projects = projects;
 }

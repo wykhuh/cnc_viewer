@@ -7,6 +7,7 @@ export const defaultStore: AppStoreType = {
   mode: "auto_change",
   fullscreen: false,
   page: "home",
+  year: 2026,
 };
 
 const proxiedStore = new Proxy(structuredClone(defaultStore), {

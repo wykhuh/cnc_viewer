@@ -1,6 +1,6 @@
 import type { Spinner } from "../types/app";
 
-export function createSpinner(selector = ".loader"): Spinner {
+export function createSpinner(selector: string): Spinner {
   let elements: NodeListOf<HTMLDivElement> | null = null;
   function init(selector: string) {
     let els = document.querySelectorAll<HTMLDivElement>(selector);

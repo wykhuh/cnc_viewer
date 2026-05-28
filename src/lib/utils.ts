@@ -71,3 +71,7 @@ const apiThrottleTime = 1000;
 export const throttledFetch = throttleAsync((url) => {
   return fetch(url);
 }, apiThrottleTime);
+
+export function range(start: number, stop: number) {
+  return [...Array(stop - start + 1).keys()].map((i) => i + start);
+}

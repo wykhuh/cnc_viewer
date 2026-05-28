@@ -1,10 +1,10 @@
 import {
   selectRandomProject,
   selectProjectById,
+  loadProjectsCsv,
 } from "../components/PageHome/data_utils";
 import { decodeAppUrl } from "./url_utils";
-import { getAndParseCSV } from "./csv_utils.ts";
-import type { AppPage, AppStoreType, Project } from "../types/app";
+import type { AppPage, AppStoreType } from "../types/app";
 
 const pathPage = {
   "/about/": "about",
@@ -17,10 +17,7 @@ export function getAppPage(pathname: string) {
 
 export async function initApp(appStore: AppStoreType) {
   // save all projects to store
-  let projects = (await getAndParseCSV(
-    "/data/cnc_2026_projects_with_taxa.csv",
-  )) as Project[];
-  appStore.data.projects = projects;
+  await loadProjectsCsv(appStore.year, appStore);
 
   // save one project to store
   let urlData = decodeAppUrl(window.location.search);
