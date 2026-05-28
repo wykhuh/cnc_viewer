@@ -105,5 +105,21 @@ export async function loadProjectsCsv(year = 2026, appStore: AppStoreType) {
   let projects = (await getAndParseCSV(
     `/data/cnc_${year}_projects_app.csv`,
   )) as Project[];
-  appStore.data.projects = projects;
+
+  appStore.data.projects = cleanupProjectsCSV(projects);
+}
+
+export function cleanupProjectsCSV(projects: Project[]) {
+  return projects
+    .filter((p) => p.title !== undefined)
+    .map((project) => {
+      return {
+        ...project,
+        id: Number(project.id),
+        latitude: Number(project.latitude),
+        longitude: Number(project.longitude),
+        place_id: Number(project.place_id),
+        species_count: Number(project.species_count),
+      };
+    });
 }
