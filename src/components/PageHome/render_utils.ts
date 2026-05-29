@@ -94,7 +94,9 @@ export function renderProjectsList(
 }
 
 export function initFilters(appStore: AppStoreType, componentCtx: any) {
-  let optionEl = componentCtx.querySelector(`option[value="${appStore.year}"]`);
+  let optionEl = componentCtx.querySelector(
+    `option[value="${appStore.currentYear}"]`,
+  );
   if (optionEl) {
     optionEl.selected = true;
   }

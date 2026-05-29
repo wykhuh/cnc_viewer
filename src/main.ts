@@ -18,7 +18,7 @@ Router.init();
 
 // called when user pressess browser back or next
 window.addEventListener("popstate", (event) => {
-  window.app.store.project = selectProjectById(
+  window.app.store.selectedProject = selectProjectById(
     event.state.project_id,
     window.app.store,
   );

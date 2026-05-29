@@ -66,7 +66,7 @@ class PageHome extends HTMLElement {
         let spinner = createSpinner(".project-loader");
         spinner.start();
         let year = Number(target.value);
-        appStore.year = year;
+        appStore.currentYear = year;
         loadProjectsCsv(year, appStore).then(() => {
           this.newProjectHandler(appStore);
           spinner.stop();
@@ -76,15 +76,15 @@ class PageHome extends HTMLElement {
   }
 
   async render(appStore: AppStoreType) {
-    if (!appStore.project) return;
+    if (!appStore.selectedProject) return;
 
     if (!this.map) {
       this.map = renderMap();
     }
 
     // render project
-    this.markers = renderProjectsOnMap([appStore.project], this.map);
-    renderProjectsList([appStore.project], this);
+    this.markers = renderProjectsOnMap([appStore.selectedProject], this.map);
+    renderProjectsList([appStore.selectedProject], this);
 
     initFilters(appStore, this);
     // render species list
@@ -100,7 +100,7 @@ class PageHome extends HTMLElement {
     // cancel existing fetch observations for previous project
     throttledFetch.cancel();
     // pick new project
-    appStore.project = selectRandomProject(appStore);
+    appStore.selectedProject = selectRandomProject(appStore);
     // update url
     updateAppUrl(window.location, appStore);
     // update UI

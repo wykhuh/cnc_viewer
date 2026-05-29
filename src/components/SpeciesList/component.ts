@@ -119,7 +119,7 @@ class SpeciesList extends HTMLElement {
   }
 
   async render(appStore: AppStoreType) {
-    let project = appStore.project;
+    let project = appStore.selectedProject;
     if (!project) return;
 
     // make fullscrren

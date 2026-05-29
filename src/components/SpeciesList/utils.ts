@@ -27,7 +27,7 @@ export function renderCarousel(
   if (!containerEl) return;
   let observations = appStore.speciesObservations;
   if (!observations) return;
-  let project = appStore.project;
+  let project = appStore.selectedProject;
   if (!project) return;
 
   containerEl.innerHTML = "";

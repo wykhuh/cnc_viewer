@@ -12,12 +12,12 @@ export function decodeAppUrl(searchParams: string) {
 }
 
 export function formatAppParams(appStore: AppStoreType) {
-  if (appStore.page !== "home") return;
+  if (appStore.currentPage !== "home") return;
 
   let params = new URLSearchParams();
 
-  if (appStore.project) {
-    params.set("project_id", appStore.project.slug);
+  if (appStore.selectedProject) {
+    params.set("project_id", appStore.selectedProject.slug);
   }
 
   return params.toString();
@@ -39,7 +39,7 @@ export function updatePushState(
 ) {
   let state = {
     pathname,
-    project_id: appStore.project?.id,
+    project_id: appStore.selectedProject?.id,
   };
   window.history.pushState(state, "", url);
 }

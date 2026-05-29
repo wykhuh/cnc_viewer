@@ -13,7 +13,7 @@ export async function pageChangeHandler(
   const path = target.getAttribute("href");
   if (!path) return;
 
-  appStore.page = getAppPage(path);
+  appStore.currentPage = getAppPage(path);
 
   let url = `${window.location.origin}${path}`;
   let params = formatAppParams(appStore);

@@ -40,7 +40,7 @@ describe("formatAppParams", () => {
 
   test("returns project_id if store has project", () => {
     let store = structuredClone(defaultStore);
-    store.project = projectDemo;
+    store.selectedProject = projectDemo;
 
     let result = formatAppParams(store);
 
@@ -49,8 +49,8 @@ describe("formatAppParams", () => {
 
   test("returns undefined if page is about", () => {
     let store = structuredClone(defaultStore);
-    store.page = "about";
-    store.project = projectDemo;
+    store.currentPage = "about";
+    store.selectedProject = projectDemo;
 
     let result = formatAppParams(store);
 

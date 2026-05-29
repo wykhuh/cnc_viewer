@@ -17,7 +17,7 @@ export function getAppPage(pathname: string) {
 
 export async function initApp(appStore: AppStoreType) {
   // save all projects to store
-  await loadProjectsCsv(appStore.year, appStore);
+  await loadProjectsCsv(appStore.currentYear, appStore);
 
   // save one project to store
   let urlData = decodeAppUrl(window.location.search);
@@ -27,12 +27,12 @@ export async function initApp(appStore: AppStoreType) {
     if (!project) {
       project = selectRandomProject(appStore);
     }
-    appStore.project = project;
+    appStore.selectedProject = project;
     // else select random project
   } else {
-    appStore.project = selectRandomProject(appStore);
+    appStore.selectedProject = selectRandomProject(appStore);
   }
 
   // save page to store
-  appStore.page = getAppPage(window.location.pathname);
+  appStore.currentPage = getAppPage(window.location.pathname);
 }

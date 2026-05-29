@@ -9,12 +9,12 @@ declare global {
 export type AppStoreType = {
   data: { projects: Project[] };
   speciesObservations: NormalizedSpeciesObservation[];
-  project?: Project;
+  selectedProject?: Project;
   animation: { looping: boolean };
   mode: ProjectMode;
   fullscreen: boolean;
-  page: AppPage;
-  year: number;
+  currentPage: AppPage;
+  currentYear: number;
 };
 
 export type AppPage = "home" | "about";
