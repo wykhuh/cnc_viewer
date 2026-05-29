@@ -1,5 +1,5 @@
 import "leaflet/dist/leaflet.css";
-import type { Map, Marker } from "leaflet";
+import type { Circle, Map, Marker } from "leaflet";
 import "../../assets/autocomplete.css";
 
 import { setupComponent } from "../../lib/component_utils";
@@ -8,8 +8,10 @@ import { template } from "./template";
 import {
   initFilters,
   renderMap,
+  renderPlacesProjectsOnMap,
   renderProjectsList,
   renderProjectsOnMap,
+  renderSelectedPlaces,
 } from "./render_utils.ts";
 import {
   loadProjectsCsv,
@@ -31,6 +33,7 @@ class PageHome extends HTMLElement {
 
   map: Map | null = null;
   markers: Marker[] = [];
+  circles: Circle[] = [];
   newProjectEl: HTMLButtonElement | null = null;
   yearSelectEl: HTMLSelectElement | null = null;
   searchInputEl: HTMLInputElement | null = null;
@@ -109,14 +112,20 @@ class PageHome extends HTMLElement {
       appStore.map = renderMap();
     }
 
-    // render project
-    this.markers = renderProjectsOnMap(
-      [appStore.selectedProject],
-      appStore.map,
-    );
-    renderProjectsList([appStore.selectedProject], this);
-
     initFilters(appStore, this);
+
+    // render project
+    let markers = renderProjectsOnMap(appStore);
+    if (markers) {
+      this.markers = markers;
+    }
+    renderProjectsList([appStore.selectedProject], this);
+    let circles = renderPlacesProjectsOnMap(appStore);
+    if (circles) {
+      this.circles = circles;
+    }
+    // render places
+    renderSelectedPlaces(appStore);
 
     // render species list
     let containerEl = this.querySelector("#data-container");
@@ -136,6 +145,7 @@ class PageHome extends HTMLElement {
     updateAppUrl(window.location, appStore);
     // update UI
     this.markers.forEach((marker) => marker.remove());
+    this.circles.forEach((circle) => circle.remove());
     this.render(appStore);
   }
 }

@@ -16,6 +16,7 @@ import type { AppStoreType, NormalizedPlace, Project } from "../../types/app";
 import type {
   BasicTaxon,
   iNatObservationsBasicAPI,
+  PlaceResult,
   SearchRecord,
 } from "../../types/inat_api";
 import pointsWithinPolygon from "@turf/points-within-polygon";
@@ -138,7 +139,7 @@ export function cleanupProjectsCSV(projects: any[]) {
     });
 }
 
-export function normalizePlaceResult(record: SearchRecord) {
+export function normalizePlaceResult(record: SearchRecord | PlaceResult) {
   let typeName;
   if (record.place_type) {
     typeName = placeTypes[record.place_type.toString() as PlaceTypesKey];

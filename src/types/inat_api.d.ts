@@ -117,3 +117,23 @@ export interface Geojson {
   type: string;
   coordinates: number[][][];
 }
+
+// ==================
+// place api
+// ==================
+
+export type iNatPlacesAPI = {
+  total_results: number;
+  page: number;
+  per_page: number;
+  results: PlaceResult[];
+};
+
+type PlaceResult = {
+  id: number;
+  bounding_box_geojson: PolygonJson;
+  display_name: string;
+  geometry_geojson: MultiPolygonJson | PolygonJson;
+  name: string;
+  place_type: number;
+};

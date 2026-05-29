@@ -1,6 +1,7 @@
 import type {
   iNatObservationsBasicAPI,
   iNatObservationsSpeciesBasicAPI,
+  iNatPlacesAPI,
 } from "../types/inat_api.d.ts";
 import { loggerUrl } from "./logger.ts";
 import { throttledFetch } from "./utils.ts";
@@ -14,6 +15,7 @@ export const autocomplete_taxa_api =
   "https://api.inaturalist.org/v1/taxa/autocomplete?";
 export const autocomplete_observation_fields_api = `https://api.inaturalist.org/v1/observation_fields/autocomplete?`;
 const observations_api_v2 = "https://api.inaturalist.org/v2/observations";
+const places_api_v2 = "https://api.inaturalist.org/v2/places";
 
 export async function inatFetch(url: string, funcName: string) {
   try {
@@ -94,5 +96,17 @@ export async function getAutocompleteProjects(query: string) {
   if (data) {
     loggerUrl(url, data.total_results);
     return data;
+  }
+}
+
+export async function getPlaceById(id: number) {
+  let fields =
+    "(bounding_box_geojson:!t,display_name:!t,geometry_geojson:!t,name:!t,place_type:!t)";
+  let data = (await inatFetch(
+    `${places_api_v2}/${id}?fields=${fields}`,
+    "getPlaceById",
+  )) as iNatPlacesAPI;
+  if (data) {
+    return data.results[0];
   }
 }

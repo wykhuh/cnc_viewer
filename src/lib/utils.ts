@@ -67,7 +67,7 @@ function throttleAsync(func: (...args: any[]) => {}, delayMS: number) {
   return throttled;
 }
 
-const apiThrottleTime = 1500;
+const apiThrottleTime = 1200;
 export const throttledFetch = throttleAsync((url) => {
   return fetch(url);
 }, apiThrottleTime);

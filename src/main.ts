@@ -12,7 +12,11 @@ import { selectProjectById } from "./components/PageHome/data_utils.ts";
 window.app = { store: store, router: Router };
 
 // populate app store
-await initApp(window.app.store);
+await initApp(
+  window.location.search,
+  window.location.pathname,
+  window.app.store,
+);
 // load page component
 Router.init();
 

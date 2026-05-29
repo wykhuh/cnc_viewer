@@ -1,10 +1,11 @@
 import L from "leaflet";
-import type { Map, Marker, Layer } from "leaflet";
+import type { Map, Marker, Layer, Circle } from "leaflet";
 import type { Feature, GeoJsonObject } from "geojson";
 
 import type { AppStoreType, Project } from "../../types/app";
-import { getMapTiles } from "../../lib/map_utils";
+import { fitBoundsPlaces, getMapTiles } from "../../lib/map_utils";
 import { iNatPlacesUrl, iNatProjectsUrl } from "../../data/inat_data";
+import { renderResourceGeometryLayer } from "../../lib/render_utils";
 
 export function renderMap() {
   let map = L.map("map", {
@@ -34,13 +35,41 @@ export function renderMarker(lat: number, lon: number, map: Map) {
   return L.marker([lat, lon]).addTo(map);
 }
 
-export function renderProjectsOnMap(targetProjects: Project[], map: Map) {
+export function renderCircleMarker(lat: number, lon: number, map: Map) {
+  return L.circle([lat, lon], {
+    color: "red",
+    fillColor: "red",
+    fillOpacity: 0.5,
+    radius: 1000,
+  }).addTo(map);
+}
+
+export function renderProjectsOnMap(appStore: AppStoreType) {
+  if (!appStore.map) return;
+  let project = appStore.selectedProject;
+  if (!project) return;
+
   let markers: Marker[] = [];
-  targetProjects.forEach((project) => {
-    let marker = renderMarker(project.latitude, project.longitude, map);
+  let marker = renderMarker(project.latitude, project.longitude, appStore.map);
+  marker.bindPopup(formatProjectDisplay(project, "project-map-popup"));
+  markers.push(marker);
+
+  return markers;
+}
+
+export function renderPlacesProjectsOnMap(appStore: AppStoreType) {
+  let map = appStore.map;
+  if (!map) return;
+  let projects = appStore.data.projectsForPlace;
+  if (!projects) return;
+
+  let markers: Circle[] = [];
+  projects.forEach((project) => {
+    let marker = renderCircleMarker(project.latitude, project.longitude, map);
     marker.bindPopup(formatProjectDisplay(project, "project-map-popup"));
     markers.push(marker);
   });
+
   return markers;
 }
 
@@ -100,5 +129,25 @@ export function initFilters(appStore: AppStoreType, componentCtx: any) {
   );
   if (optionEl) {
     optionEl.selected = true;
+  }
+}
+
+export function renderSelectedPlaces(appStore: AppStoreType) {
+  if (!appStore.selectedPlaces) return;
+  if (!appStore.map) return;
+
+  // add boundaries of selected place to map
+  let layer = renderResourceGeometryLayer(
+    appStore.selectedPlaces,
+    appStore.map,
+    "place layer",
+  );
+
+  // add place to store
+  if (layer) {
+    appStore.placesMapLayers = layer;
+
+    // zoom to map to fit all selected places
+    fitBoundsPlaces(appStore);
   }
 }
