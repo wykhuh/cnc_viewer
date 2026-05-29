@@ -1,7 +1,7 @@
 import type { AppStoreType } from "../types/app";
 
 export const defaultStore: AppStoreType = {
-  data: { projects: [] },
+  data: { projects: [], projectsForPlace: [] },
   speciesObservations: [],
   animation: { looping: false },
   mode: "auto_change",

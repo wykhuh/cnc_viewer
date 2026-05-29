@@ -1,3 +1,4 @@
+import { multiPolygon, points, polygon } from "@turf/helpers";
 import {
   observationPhotoResponse,
   observationPhotoResponse2,
@@ -11,12 +12,13 @@ import {
   getObservationsSpeciesBasic,
 } from "../../lib/inat_api";
 import { sampleArray } from "../../lib/utils";
-import type { AppStoreType, Project } from "../../types/app";
+import type { AppStoreType, NormalizedPlace, Project } from "../../types/app";
 import type {
   BasicTaxon,
   iNatObservationsBasicAPI,
   SearchRecord,
 } from "../../types/inat_api";
+import pointsWithinPolygon from "@turf/points-within-polygon";
 
 export function getTargetProjects(
   latitudeValue: number,
@@ -87,20 +89,30 @@ export async function fetchSpecies(project: Project) {
 }
 
 export function selectRandomProject(appStore: AppStoreType) {
-  let randomProject = sampleArray(appStore.data.projects);
+  if (appStore.selectedPlaces?.id) {
+    return sampleArray(appStore.data.projectsForPlace);
+  } else {
+    return sampleArray(appStore.data.projects);
+    // return appStore.data.projects.filter((p) => p.id == 266374)[0];
+  }
   // 279618 - 8 species all rights reserved by two observers
   // 279847 - 3 species are all rights reserved by the same observer
   // 270080 - 3 species only have 1 all rights obs
   // 264323 - 1 species common hackberry have CC and all rights observations
   // 266374 - painted turtle, observation ok, photo ND
   // 242086 - 7 species all rights reserved by one observer
-  // randomProject = appStore.data.projects.filter((p) => p.id == 266374)[0];
-
-  return randomProject;
 }
 
 export function selectProjectById(id: number | string, appStore: AppStoreType) {
-  return appStore.data.projects.find((p) => p.slug === id || p.id === id);
+  if (appStore.selectedPlaces?.id) {
+    return appStore.data.projectsForPlace.find(
+      (p) => p.slug === id || p.id === Number(id),
+    );
+  } else {
+    return appStore.data.projects.find(
+      (p) => p.slug === id || p.id === Number(id),
+    );
+  }
 }
 
 export async function loadProjectsCsv(year = 2026, appStore: AppStoreType) {
@@ -111,7 +123,7 @@ export async function loadProjectsCsv(year = 2026, appStore: AppStoreType) {
   appStore.data.projects = cleanupProjectsCSV(projects);
 }
 
-export function cleanupProjectsCSV(projects: Project[]) {
+export function cleanupProjectsCSV(projects: any[]) {
   return projects
     .filter((p) => p.title !== undefined)
     .map((project) => {
@@ -138,4 +150,51 @@ export function normalizePlaceResult(record: SearchRecord) {
     id: record.id,
     place_type_name: typeName,
   };
+}
+
+// add projects within place to store
+export function projectsWithinPlaceHandler(
+  place: NormalizedPlace,
+  appStore: AppStoreType,
+) {
+  let placeGeometry = place.geometry;
+
+  if (!placeGeometry) {
+    return;
+  }
+
+  // convert project lat long into points
+  let projectsLongLat = appStore.data.projects
+    .filter((p) => p.latitude !== undefined)
+    .map((p) => [p.longitude, p.latitude]);
+  let projectPoints = points(projectsLongLat);
+
+  // convert project geometry into polygons
+  let placePolygon;
+  if (placeGeometry.type === "MultiPolygon") {
+    placePolygon = multiPolygon(placeGeometry.coordinates);
+  } else {
+    placePolygon = polygon(placeGeometry.coordinates);
+  }
+
+  // look for project points within place polygon
+  // @ts-ignore
+  let withinResults = pointsWithinPolygon(projectPoints, placePolygon);
+
+  // find projects for within points
+  let targetProjects: Project[] = [];
+  withinResults.features.forEach((feature) => {
+    appStore.data.projects
+      .filter(
+        (p) =>
+          p.longitude === feature.geometry.coordinates[0] &&
+          p.latitude === feature.geometry.coordinates[1],
+      )
+      .forEach((p) => targetProjects.push(p));
+  });
+
+  if (targetProjects.length > 0) {
+    // save projects to store
+    appStore.data.projectsForPlace = targetProjects;
+  }
 }

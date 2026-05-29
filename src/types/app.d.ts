@@ -1,5 +1,11 @@
 import type { GeoJSON, Map } from "leaflet";
-import type { MultiPolygonJson, PolygonJson } from "./inat_api";
+
+import type {
+  BasicPhoto,
+  CCLicense,
+  MultiPolygonJson,
+  PolygonJson,
+} from "./inat_api";
 
 declare global {
   interface Window {
@@ -8,7 +14,7 @@ declare global {
 }
 
 export type AppStoreType = {
-  data: { projects: Project[] };
+  data: { projects: Project[]; projectsForPlace: Project[] };
   speciesObservations: NormalizedSpeciesObservation[];
   selectedProject?: Project;
   animation: { looping: boolean };
@@ -42,7 +48,6 @@ export type Project = {
   place_id: number;
   icon: string;
   species_count: number;
-  place_name?: string;
   place_display_name: string;
   latitude: number;
   longitude: number;
@@ -87,6 +92,7 @@ type Spinner = {
 
 export type ValidAppParams = {
   project_id?: string;
+  place_id?: string;
 };
 
 type RouterType = {

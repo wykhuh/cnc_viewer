@@ -1,4 +1,5 @@
 import L from "leaflet";
+import type { Map, Marker, Layer } from "leaflet";
 import type { Feature, GeoJsonObject } from "geojson";
 
 import type { AppStoreType, Project } from "../../types/app";
@@ -19,7 +20,7 @@ export function renderMap() {
   return map;
 }
 
-export function renderLatLine(latitudeValue: number, map: L.Map) {
+export function renderLatLine(latitudeValue: number, map: Map) {
   let factor = latitudeValue > 0 ? 1 : -1;
   return L.polygon([
     [latitudeValue, -180],
@@ -29,12 +30,12 @@ export function renderLatLine(latitudeValue: number, map: L.Map) {
   ]).addTo(map);
 }
 
-export function renderMarker(lat: number, lon: number, map: L.Map) {
+export function renderMarker(lat: number, lon: number, map: Map) {
   return L.marker([lat, lon]).addTo(map);
 }
 
-export function renderProjectsOnMap(targetProjects: Project[], map: L.Map) {
-  let markers: L.Marker[] = [];
+export function renderProjectsOnMap(targetProjects: Project[], map: Map) {
+  let markers: Marker[] = [];
   targetProjects.forEach((project) => {
     let marker = renderMarker(project.latitude, project.longitude, map);
     marker.bindPopup(formatProjectDisplay(project, "project-map-popup"));
@@ -65,8 +66,8 @@ function formatProjectDisplay(
       </div>`;
 }
 
-export function renderEcoregions(ecoregions: GeoJsonObject, map: L.Map) {
-  function onEachFeature(feature: Feature, layer: L.Layer) {
+export function renderEcoregions(ecoregions: GeoJsonObject, map: Map) {
+  function onEachFeature(feature: Feature, layer: Layer) {
     if (feature.properties && feature.properties.Bioregions) {
       layer.bindPopup(feature.properties.Bioregions);
     }

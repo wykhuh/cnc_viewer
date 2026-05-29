@@ -1,5 +1,5 @@
-import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import type { Map, Marker } from "leaflet";
 import "../../assets/autocomplete.css";
 
 import { setupComponent } from "../../lib/component_utils";
@@ -11,7 +11,11 @@ import {
   renderProjectsList,
   renderProjectsOnMap,
 } from "./render_utils.ts";
-import { loadProjectsCsv, selectRandomProject } from "./data_utils.ts";
+import {
+  loadProjectsCsv,
+  selectRandomProject,
+  projectsWithinPlaceHandler,
+} from "./data_utils.ts";
 import { updateAppUrl } from "../../lib/url_utils.ts";
 import { throttledFetch } from "../../lib/utils.ts";
 import { createSpinner } from "../../lib/spinner.ts";
@@ -25,8 +29,8 @@ class PageHome extends HTMLElement {
     super();
   }
 
-  map: L.Map | null = null;
-  markers: L.Marker[] = [];
+  map: Map | null = null;
+  markers: Marker[] = [];
   newProjectEl: HTMLButtonElement | null = null;
   yearSelectEl: HTMLSelectElement | null = null;
   searchInputEl: HTMLInputElement | null = null;
@@ -86,6 +90,12 @@ class PageHome extends HTMLElement {
       let place = event.detail.selection.value;
       // add place to store and map
       placeSelectedHandler(place, appStore);
+
+      // add projects within place to store and map, rerender caroseul,
+      projectsWithinPlaceHandler(place, appStore);
+      if (appStore.data.projectsForPlace) {
+        this.newProjectHandler(appStore);
+      }
     }
   }
 
@@ -107,6 +117,7 @@ class PageHome extends HTMLElement {
     renderProjectsList([appStore.selectedProject], this);
 
     initFilters(appStore, this);
+
     // render species list
     let containerEl = this.querySelector("#data-container");
     if (containerEl) {

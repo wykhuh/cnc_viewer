@@ -20,7 +20,7 @@ export async function initApp(appStore: AppStoreType) {
   await loadProjectsCsv(appStore.currentYear, appStore);
 
   // save one project to store
-  let urlData = decodeAppUrl(window.location.search);
+  let urlData = decodeAppUrl(window.location.search, window.location.pathname);
   // if project_id is in the url, try to select project for id
   if (urlData.project_id) {
     let project = selectProjectById(urlData.project_id, appStore);
