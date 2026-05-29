@@ -8,6 +8,7 @@ export const defaultStore: AppStoreType = {
   fullscreen: false,
   currentPage: "home",
   currentYear: 2026,
+  map: null,
 };
 
 const proxiedStore = new Proxy(structuredClone(defaultStore), {

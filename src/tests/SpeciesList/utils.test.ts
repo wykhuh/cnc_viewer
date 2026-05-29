@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import { expect, test, describe } from "vitest";
 import { formatNormalizedSpeciesObservation } from "../../components/SpeciesList/utils";
 import type {

@@ -1,4 +1,5 @@
-import type { BasicPhoto, CCLicense } from "./inat_api";
+import type { GeoJSON, Map } from "leaflet";
+import type { MultiPolygonJson, PolygonJson } from "./inat_api";
 
 declare global {
   interface Window {
@@ -15,6 +16,9 @@ export type AppStoreType = {
   fullscreen: boolean;
   currentPage: AppPage;
   currentYear: number;
+  map: Map | null;
+  placesMapLayers?: GeoJSON;
+  selectedPlaces?: NormalizedPlace;
 };
 
 export type AppPage = "home" | "about";
@@ -38,7 +42,7 @@ export type Project = {
   place_id: number;
   icon: string;
   species_count: number;
-  place_name: string;
+  place_name?: string;
   place_display_name: string;
   latitude: number;
   longitude: number;
@@ -89,3 +93,24 @@ type RouterType = {
   init: () => void;
   go: (path: string) => void;
 };
+
+export type NormalizedPlace = {
+  display_name?: string;
+  geometry?: PolygonJson | MultiPolygonJson;
+  bounding_box?: PolygonJson;
+  id: number;
+  // place_type?: number;
+  place_type_name?: string;
+  // slug?: string;
+};
+
+export interface AutoCompleteEventType {
+  detail: {
+    query: string;
+    selection: {
+      index: number;
+      match: string;
+      value: NormalizedPlace;
+    };
+  };
+}

@@ -4,6 +4,7 @@ import {
   observationPhotoResponse3,
   observationSpecies,
 } from "../../data/inat_api";
+import { placeTypes, type PlaceTypesKey } from "../../data/inat_data";
 import { getAndParseCSV } from "../../lib/csv_utils";
 import {
   getObservationsBasic,
@@ -14,6 +15,7 @@ import type { AppStoreType, Project } from "../../types/app";
 import type {
   BasicTaxon,
   iNatObservationsBasicAPI,
+  SearchRecord,
 } from "../../types/inat_api";
 
 export function getTargetProjects(
@@ -122,4 +124,18 @@ export function cleanupProjectsCSV(projects: Project[]) {
         species_count: Number(project.species_count),
       };
     });
+}
+
+export function normalizePlaceResult(record: SearchRecord) {
+  let typeName;
+  if (record.place_type) {
+    typeName = placeTypes[record.place_type.toString() as PlaceTypesKey];
+  }
+  return {
+    display_name: record.display_name,
+    geometry: record.geometry_geojson as any,
+    bounding_box: record.bounding_box_geojson,
+    id: record.id,
+    place_type_name: typeName,
+  };
 }

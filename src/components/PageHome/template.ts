@@ -14,6 +14,14 @@ export const template = html`
             ${yearOptions()}
           </select>
         </div>
+
+        <div class="form-group">
+          <label
+            >Search
+            <input id="search-places" type="text" autocomplete="off" />
+          </label>
+        </div>
+
         <div class="project-loader loader"></div>
 
         <div id="projects-list"></div>

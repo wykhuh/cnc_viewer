@@ -1,7 +1,7 @@
 import L from "leaflet";
 
 import { loggerUrl } from "./logger.ts";
-import type { ObservationTilesSettingType } from "../types/app";
+import type { AppStoreType, ObservationTilesSettingType } from "../types/app";
 
 export function getMapTiles(): {
   [name: string]: ObservationTilesSettingType;
@@ -258,5 +258,15 @@ export function addOverlayToMap(
     return layer;
   } catch (error) {
     console.log("addOverlayToMap ERROR:", error);
+  }
+}
+
+export function fitBoundsPlaces(appStore: AppStoreType) {
+  let map = appStore.map;
+  if (!map) return;
+
+  let bbox = appStore.selectedPlaces?.bounding_box;
+  if (bbox) {
+    map.fitBounds(L.featureGroup([L.geoJSON(bbox)]).getBounds());
   }
 }
