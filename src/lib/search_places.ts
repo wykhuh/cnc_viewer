@@ -7,8 +7,7 @@ import type {
 } from "../types/app.d.ts";
 import { getAutocompletePlaces } from "../lib/inat_api.ts";
 import type { iNatSearchAPI } from "../types/inat_api";
-import { renderResourceGeometryLayer } from "./render_utils.ts";
-import { fitBoundsPlaces } from "./map_utils.ts";
+import { fitBoundsPlaces, renderGeojsonLayer } from "./map_utils.ts";
 import { normalizePlaceResult } from "../components/PageHome/data_utils.ts";
 
 export function setupPlacesSearch(selector: string) {
@@ -70,7 +69,7 @@ export function renderAutocompletePlace(item: NormalizedPlace): string {
 }
 
 // called by autocomplete search when an place option is selected
-export async function placeSelectedHandler(
+export function placeSelectedHandler(
   selection: NormalizedPlace,
   appStore: AppStoreType,
 ) {
@@ -87,7 +86,12 @@ export async function placeSelectedHandler(
   }
 
   // add boundaries of selected place to map
-  layer = renderResourceGeometryLayer(place, map, "place layer");
+  if (place.geometry) {
+    layer = renderGeojsonLayer(
+      { geometry: place.geometry, color: "blue", fillOpacity: 0 },
+      map,
+    );
+  }
 
   // add place to store
   if (layer) {

@@ -124,7 +124,7 @@ export async function loadProjectsCsv(year = 2026, appStore: AppStoreType) {
   appStore.data.projects = cleanupProjectsCSV(projects);
 }
 
-export function cleanupProjectsCSV(projects: any[]) {
+export function cleanupProjectsCSV(projects: any[]): Project[] {
   return projects
     .filter((p) => p.title !== undefined)
     .map((project) => {

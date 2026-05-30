@@ -1,7 +1,13 @@
 import L from "leaflet";
+import type { GeoJSON, Layer, Map } from "leaflet";
 
 import { loggerUrl } from "./logger.ts";
-import type { AppStoreType, ObservationTilesSettingType } from "../types/app";
+import type {
+  AppStoreType,
+  CircleSettings,
+  GeoJSONSettings,
+  ObservationTilesSettingType,
+} from "../types/app";
 
 export function getMapTiles(): {
   [name: string]: ObservationTilesSettingType;
@@ -268,5 +274,59 @@ export function fitBoundsPlaces(appStore: AppStoreType) {
   let bbox = appStore.selectedPlaces?.bounding_box;
   if (bbox) {
     map.fitBounds(L.featureGroup([L.geoJSON(bbox)]).getBounds());
+  }
+}
+
+export function fitBounds(layer: GeoJSON, map: Map) {
+  map.fitBounds(L.featureGroup([layer]).getBounds(), { maxZoom: 6 });
+}
+
+export function renderMarker(lat: number, lon: number, map: Map) {
+  return L.marker([lat, lon]).addTo(map);
+}
+
+export function renderGeojsonLayer(
+  settings: GeoJSONSettings,
+  map: Map,
+): GeoJSON {
+  function onEachFeature(feature: any, layer: Layer) {
+    if (feature.properties && feature.properties.popupContent) {
+      layer.bindPopup(feature.properties.popupContent);
+    }
+  }
+  let options: any = {
+    color: settings.color,
+    fillColor: settings.fillColor,
+    fillOpacity:
+      settings.fillOpacity === undefined ? 0.2 : settings.fillOpacity,
+    onEachFeature: onEachFeature,
+  };
+
+  var geojsonFeature: any = {
+    type: "Feature",
+    properties: {
+      popupContent: settings.popupContent,
+    },
+    geometry: settings.geometry,
+  };
+
+  return L.geoJSON(geojsonFeature, options).addTo(map);
+}
+
+export function renderCircleMarker(settings: CircleSettings, map: Map) {
+  return L.circle([settings.latitude, settings.longitude], {
+    color: settings.color,
+    fillColor: settings.fillColor,
+    fillOpacity:
+      settings.fillOpacity === undefined ? 0.2 : settings.fillOpacity,
+    radius: settings.radius || 500,
+  }).addTo(map);
+}
+
+export function removeMap(appStore: AppStoreType) {
+  if (appStore.map) {
+    // remove map and event listeners
+    appStore.map.remove();
+    appStore.map = null;
   }
 }

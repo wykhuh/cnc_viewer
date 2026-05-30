@@ -1,5 +1,5 @@
 import "leaflet/dist/leaflet.css";
-import type { Circle, Map, Marker } from "leaflet";
+import type { Circle, Map, GeoJSON } from "leaflet";
 import "../../assets/autocomplete.css";
 
 import { setupComponent } from "../../lib/component_utils";
@@ -8,10 +8,10 @@ import { template } from "./template";
 import {
   initFilters,
   renderMap,
-  renderPlacesProjectsOnMap,
-  renderProjectsList,
-  renderProjectsOnMap,
+  renderSelectedProject,
+  renderProjectOnMap,
   renderSelectedPlaces,
+  renderProjectsWithinPlaceOnMap,
 } from "./render_utils.ts";
 import {
   loadProjectsCsv,
@@ -25,6 +25,7 @@ import {
   placeSelectedHandler,
   setupPlacesSearch,
 } from "../../lib/search_places.ts";
+import { removeMap } from "../../lib/map_utils.ts";
 
 class PageHome extends HTMLElement {
   constructor() {
@@ -32,8 +33,9 @@ class PageHome extends HTMLElement {
   }
 
   map: Map | null = null;
-  markers: Marker[] = [];
-  circles: Circle[] = [];
+  placeLayer: GeoJSON | undefined = undefined;
+  projectLayer: GeoJSON | undefined = undefined;
+  projectsWithinPlace: Circle[] = [];
   newProjectEl: HTMLButtonElement | null = null;
   yearSelectEl: HTMLSelectElement | null = null;
   searchInputEl: HTMLInputElement | null = null;
@@ -58,6 +60,8 @@ class PageHome extends HTMLElement {
     this.yearSelectEl?.removeEventListener("change", this);
     window.removeEventListener("loadNewProject", this);
     window.removeEventListener("selection", this);
+    this.removeMapLayers();
+    removeMap(window.app.store);
   }
 
   handleEvent(event: CustomEvent) {
@@ -103,7 +107,8 @@ class PageHome extends HTMLElement {
   }
 
   async render(appStore: AppStoreType) {
-    if (!appStore.selectedProject) return;
+    let selectedProject = appStore.selectedProject;
+    if (!selectedProject) return;
 
     setupPlacesSearch("#search-places");
 
@@ -114,18 +119,24 @@ class PageHome extends HTMLElement {
 
     initFilters(appStore, this);
 
-    // render project
-    let markers = renderProjectsOnMap(appStore);
-    if (markers) {
-      this.markers = markers;
-    }
-    renderProjectsList([appStore.selectedProject], this);
-    let circles = renderPlacesProjectsOnMap(appStore);
-    if (circles) {
-      this.circles = circles;
-    }
     // render places
-    renderSelectedPlaces(appStore);
+    let placeLayer = renderSelectedPlaces(appStore);
+    if (placeLayer) {
+      this.placeLayer = placeLayer;
+    }
+
+    // render project
+    let layer = await renderProjectOnMap(appStore);
+    if (layer) {
+      this.projectLayer = layer;
+    }
+    renderSelectedProject(selectedProject, this);
+
+    // render projects within place
+    let markers = renderProjectsWithinPlaceOnMap(appStore);
+    if (markers) {
+      this.projectsWithinPlace = markers;
+    }
 
     // render species list
     let containerEl = this.querySelector("#data-container");
@@ -144,9 +155,14 @@ class PageHome extends HTMLElement {
     // update url
     updateAppUrl(window.location, appStore);
     // update UI
-    this.markers.forEach((marker) => marker.remove());
-    this.circles.forEach((circle) => circle.remove());
+    this.removeMapLayers();
     this.render(appStore);
+  }
+
+  removeMapLayers() {
+    this.projectsWithinPlace.forEach((marker) => marker.remove());
+    this.projectLayer?.remove();
+    this.placeLayer?.remove();
   }
 }
 

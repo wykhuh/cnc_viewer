@@ -46,6 +46,8 @@ export type Project = {
   title: string;
   slug: string;
   place_id: number;
+  place_uuid: string;
+  place_geometry?: PolygonJson | MultiPolygonJson;
   icon: string;
   species_count: number;
   place_display_name: string;
@@ -119,4 +121,21 @@ export interface AutoCompleteEventType {
       value: NormalizedPlace;
     };
   };
+}
+
+interface LeafletOptions {
+  color?: string;
+  fillColor?: string;
+  fillOpacity?: number;
+}
+
+export interface GeoJSONSettings extends LeafletOptions {
+  geometry: MultiPolygonJson | PolygonJson;
+  popupContent?: string;
+}
+
+export interface CircleSettings extends LeafletOptions {
+  latitude: number;
+  longitude: number;
+  radius?: number;
 }

@@ -99,7 +99,7 @@ export async function getAutocompleteProjects(query: string) {
   }
 }
 
-export async function getPlaceById(id: number) {
+export async function getPlaceById(id: number | string) {
   let fields =
     "(bounding_box_geojson:!t,display_name:!t,geometry_geojson:!t,name:!t,place_type:!t)";
   let data = (await inatFetch(

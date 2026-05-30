@@ -1,11 +1,16 @@
 import L from "leaflet";
-import type { Map, Marker, Layer, Circle } from "leaflet";
+import type { Map, Layer, Circle } from "leaflet";
 import type { Feature, GeoJsonObject } from "geojson";
 
 import type { AppStoreType, Project } from "../../types/app";
-import { fitBoundsPlaces, getMapTiles } from "../../lib/map_utils";
+import {
+  fitBounds,
+  getMapTiles,
+  renderCircleMarker,
+  renderGeojsonLayer,
+} from "../../lib/map_utils";
 import { iNatPlacesUrl, iNatProjectsUrl } from "../../data/inat_data";
-import { renderResourceGeometryLayer } from "../../lib/render_utils";
+import { getPlaceById } from "../../lib/inat_api";
 
 export function renderMap() {
   let map = L.map("map", {
@@ -31,33 +36,47 @@ export function renderLatLine(latitudeValue: number, map: Map) {
   ]).addTo(map);
 }
 
-export function renderMarker(lat: number, lon: number, map: Map) {
-  return L.marker([lat, lon]).addTo(map);
-}
-
-export function renderCircleMarker(lat: number, lon: number, map: Map) {
-  return L.circle([lat, lon], {
-    color: "red",
-    fillColor: "red",
-    fillOpacity: 0.5,
-    radius: 1000,
-  }).addTo(map);
-}
-
-export function renderProjectsOnMap(appStore: AppStoreType) {
+export async function renderProjectOnMap(appStore: AppStoreType) {
   if (!appStore.map) return;
   let project = appStore.selectedProject;
   if (!project) return;
 
-  let markers: Marker[] = [];
-  let marker = renderMarker(project.latitude, project.longitude, appStore.map);
-  marker.bindPopup(formatProjectDisplay(project, "project-map-popup"));
-  markers.push(marker);
+  let geometry;
+  // if project has geometry
+  if (project.place_geometry) {
+    geometry = project.place_geometry;
+    // else fetch geometry for place
+  } else {
+    let placeData = await getPlaceById(project.place_uuid);
+    if (!placeData) return;
 
-  return markers;
+    geometry = placeData.geometry_geojson;
+
+    // add geometry to project
+    project.place_geometry = placeData.geometry_geojson;
+    // add geometry to data.projects
+    let dataProject = appStore.data.projects.find((p) => p.id === project.id);
+    if (dataProject) {
+      dataProject.place_geometry = placeData.geometry_geojson;
+    }
+  }
+
+  if (geometry) {
+    let layer = renderGeojsonLayer(
+      {
+        geometry: geometry,
+        popupContent: formatProjectDisplay(project, "project-map-popup"),
+        color: "green",
+      },
+      appStore.map,
+    );
+    fitBounds(layer, appStore.map);
+
+    return layer;
+  }
 }
 
-export function renderPlacesProjectsOnMap(appStore: AppStoreType) {
+export function renderProjectsWithinPlaceOnMap(appStore: AppStoreType) {
   let map = appStore.map;
   if (!map) return;
   let projects = appStore.data.projectsForPlace;
@@ -65,7 +84,14 @@ export function renderPlacesProjectsOnMap(appStore: AppStoreType) {
 
   let markers: Circle[] = [];
   projects.forEach((project) => {
-    let marker = renderCircleMarker(project.latitude, project.longitude, map);
+    let marker = renderCircleMarker(
+      {
+        latitude: project.latitude,
+        longitude: project.longitude,
+        color: "red",
+      },
+      map,
+    );
     marker.bindPopup(formatProjectDisplay(project, "project-map-popup"));
     markers.push(marker);
   });
@@ -107,20 +133,18 @@ export function renderEcoregions(ecoregions: GeoJsonObject, map: Map) {
   }).addTo(map);
 }
 
-export function renderProjectsList(
-  targetProjects: Project[],
+export function renderSelectedProject(
+  project: Project,
   componentCtx: HTMLElement,
 ) {
   let containerEl = componentCtx.querySelector("#projects-list");
   if (!containerEl) return;
   containerEl.innerHTML = "";
 
-  targetProjects.forEach((project) => {
-    let itemEl = document.createElement("div");
-    let content = formatProjectDisplay(project, "project-list-item", "h2");
-    itemEl.innerHTML = content;
-    containerEl.appendChild(itemEl);
-  });
+  let itemEl = document.createElement("div");
+  let content = formatProjectDisplay(project, "project-list-item", "h2");
+  itemEl.innerHTML = content;
+  containerEl.appendChild(itemEl);
 }
 
 export function initFilters(appStore: AppStoreType, componentCtx: any) {
@@ -135,19 +159,22 @@ export function initFilters(appStore: AppStoreType, componentCtx: any) {
 export function renderSelectedPlaces(appStore: AppStoreType) {
   if (!appStore.selectedPlaces) return;
   if (!appStore.map) return;
+  if (!appStore.selectedPlaces.geometry) return;
 
   // add boundaries of selected place to map
-  let layer = renderResourceGeometryLayer(
-    appStore.selectedPlaces,
+  let layer = renderGeojsonLayer(
+    {
+      geometry: appStore.selectedPlaces.geometry,
+      color: "blue",
+      fillOpacity: 0,
+    },
     appStore.map,
-    "place layer",
   );
 
   // add place to store
   if (layer) {
     appStore.placesMapLayers = layer;
-
-    // zoom to map to fit all selected places
-    fitBoundsPlaces(appStore);
   }
+
+  return layer;
 }
