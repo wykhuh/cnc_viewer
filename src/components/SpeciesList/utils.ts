@@ -97,11 +97,11 @@ function renderCarouselItem(
       content += "<div>";
       content += `Note: Photo not displayed because photo is `;
       if (photo.license_code) {
-        content += photo.license_code;
+        content += `${photo.license_code}.`;
       } else {
-        content += "all rights reserved";
+        content += "all rights reserved.";
       }
-      content += "</div>";
+      content += " Please visit iNaturalist to see the photo.</div>";
     }
   } else {
     content += "<span class='loader obs-loader'></span>";
@@ -161,10 +161,11 @@ function renderCarouselItem(
     content += "<div>";
     content += `<dt>Note:&nbsp;</dt><dd>Observation not displayed because observation is `;
     if (obs.license_code) {
-      content += obs.license_code;
+      content += `${obs.license_code}.`;
     } else {
-      content += "all rights reserved";
+      content += "all rights reserved.";
     }
+    content += " Please visit iNaturalist to see the observation.";
     content += `</dd>`;
     content += "</div>";
 
