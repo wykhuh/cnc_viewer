@@ -16,8 +16,8 @@ export function renderMap() {
   let map = L.map("map", {
     center: [0, 0],
     zoom: 0,
-    maxZoom: 10,
   });
+  map.zoomControl.setPosition("bottomright");
 
   // add basemaps
   let { OpenStreetMap } = getMapTiles();
