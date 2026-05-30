@@ -1,7 +1,9 @@
 import "./components/PageHome/component.ts";
+import "./components/PageAbout/component.ts";
 import "./components/SpeciesList/component.ts";
 import "./components/AppHeader/component.ts";
-import "./components/PageAbout/component.ts";
+import "./components/SelectedPlace/component.ts";
+import "./components/SelectedProject/component.ts";
 
 import store from "./lib/store.ts";
 import { initApp } from "./lib/init_app.ts";
@@ -32,4 +34,3 @@ window.addEventListener("popstate", (event) => {
 updateAppUrl(window.location, window.app.store);
 
 // TODO: allow users to set verifiable, quality_grade
-// TODO: allow users to select projects by place

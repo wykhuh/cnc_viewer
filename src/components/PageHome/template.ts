@@ -24,7 +24,7 @@ export const template = html`
 
         <div class="project-loader loader"></div>
 
-        <div id="projects-list"></div>
+        <div id="selected-resources-list"></div>
         <button id="new-project" class="btn-primary">Select new project</button>
       </div>
 

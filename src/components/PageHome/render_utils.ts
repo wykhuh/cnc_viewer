@@ -1,15 +1,15 @@
 import L from "leaflet";
-import type { Map, Layer, Circle } from "leaflet";
+import type { Map, Layer, Marker } from "leaflet";
 import type { Feature, GeoJsonObject } from "geojson";
 
 import type { AppStoreType, Project } from "../../types/app";
 import {
   fitBounds,
   getMapTiles,
-  renderCircleMarker,
   renderGeojsonLayer,
+  renderMarker,
 } from "../../lib/map_utils";
-import { iNatPlacesUrl, iNatProjectsUrl } from "../../data/inat_data";
+import { iNatProjectsUrl } from "../../data/inat_data";
 import { getPlaceById } from "../../lib/inat_api";
 
 export function renderMap() {
@@ -81,17 +81,15 @@ export function renderProjectsWithinPlaceOnMap(appStore: AppStoreType) {
   let projects = appStore.data.projectsForPlace;
   if (!projects) return;
 
-  let markers: Circle[] = [];
+  let markers: Marker[] = [];
   projects
     // don't draw circle marker for selected project
     .filter((p) => p.id !== appStore.selectedProject?.id)
     .forEach((project) => {
-      let marker = renderCircleMarker(
+      let marker = renderMarker(
         {
           latitude: project.latitude,
           longitude: project.longitude,
-          color: "#555",
-          radius: 5000,
         },
         map,
       );
@@ -104,33 +102,13 @@ export function renderProjectsWithinPlaceOnMap(appStore: AppStoreType) {
   return markers;
 }
 
-function formatProjectDisplay(project: Project, titleTag: string) {
-  let content = "";
-
-  let link = `<a href="${iNatProjectsUrl}/${project.id}">${project.title}</a>`;
-  if (titleTag === "div") {
-    content += `<div>${link}</div>`;
-  } else {
-    content += `<h2>${link}</h2>`;
-  }
-  content += `
-  <dl>
-    <div>
-      <dt>Place:</dt>
-      <dd>
-        &nbsp;<a href="${iNatPlacesUrl}/${project.place_id}"
-          >${project.place_display_name}</a
-        >
-      </dd>
-    </div>
-  </dl>`;
-  return content;
-}
-
 function formatProjectMapPopup(project: Project, includeButton = false) {
   let container = document.createElement("div");
   container.className = "project-map-popup";
-  container.innerHTML = formatProjectDisplay(project, "div");
+
+  let content = `<div><a href="${iNatProjectsUrl}/${project.id}">${project.title}</a></div>`;
+  content += `<div>${project.place_display_name}</div>`;
+  container.innerHTML = content;
 
   if (includeButton) {
     let button = document.createElement("button");
@@ -151,18 +129,23 @@ function formatProjectMapPopup(project: Project, includeButton = false) {
   return container;
 }
 
-export function renderSelectedProject(
-  project: Project,
+export function renderSelectedResources(
+  appStore: AppStoreType,
   componentCtx: HTMLElement,
 ) {
-  let containerEl = componentCtx.querySelector("#projects-list");
+  let containerEl = componentCtx.querySelector("#selected-resources-list");
   if (!containerEl) return;
   containerEl.innerHTML = "";
 
-  let itemEl = document.createElement("div");
-  itemEl.className = "project-list-item";
-  itemEl.innerHTML = formatProjectDisplay(project, "h2");
-  containerEl.appendChild(itemEl);
+  if (appStore.selectedProject) {
+    let component = document.createElement("selected-project");
+    containerEl.appendChild(component);
+  }
+
+  if (appStore.selectedPlaces) {
+    let component = document.createElement("selected-place");
+    containerEl.appendChild(component);
+  }
 }
 
 export function renderEcoregions(ecoregions: GeoJsonObject, map: Map) {
@@ -186,7 +169,7 @@ export function initFilters(appStore: AppStoreType, componentCtx: any) {
   }
 }
 
-export function renderSelectedPlaces(appStore: AppStoreType) {
+export function renderPlaceOnMap(appStore: AppStoreType) {
   if (!appStore.selectedPlaces) return;
   if (!appStore.map) return;
   if (!appStore.selectedPlaces.geometry) return;

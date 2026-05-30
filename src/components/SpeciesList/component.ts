@@ -186,7 +186,7 @@ class SpeciesList extends HTMLElement {
       // load new project at end of observations
       if (this.currentIndex === appStore.speciesObservations.length - 1) {
         this.stopAnimation();
-        window.dispatchEvent(new Event("loadNewProject"));
+        window.dispatchEvent(new Event("loadRandomProject"));
         return;
       }
 

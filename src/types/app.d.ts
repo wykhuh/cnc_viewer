@@ -139,3 +139,8 @@ export interface CircleSettings extends LeafletOptions {
   longitude: number;
   radius?: number;
 }
+
+export interface MarkerSettings {
+  latitude: number;
+  longitude: number;
+}

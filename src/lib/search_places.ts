@@ -102,3 +102,14 @@ export function placeSelectedHandler(
   // zoom to map to fit all selected places
   fitBoundsPlaces(appStore);
 }
+
+export function removePlace(appStore: AppStoreType) {
+  appStore.selectedPlaces = undefined;
+  appStore.data.projectsForPlace = [];
+
+  if (appStore.map && appStore.placesMapLayers) {
+    appStore.placesMapLayers.removeFrom(appStore.map);
+  }
+
+  window.dispatchEvent(new Event("placeRemoved"));
+}

@@ -1,5 +1,5 @@
 import "leaflet/dist/leaflet.css";
-import type { Circle, Map, GeoJSON } from "leaflet";
+import type { Map, GeoJSON, Marker } from "leaflet";
 import "../../assets/autocomplete.css";
 
 import { setupComponent } from "../../lib/component_utils";
@@ -8,9 +8,9 @@ import { template } from "./template";
 import {
   initFilters,
   renderMap,
-  renderSelectedProject,
+  renderSelectedResources,
   renderProjectOnMap,
-  renderSelectedPlaces,
+  renderPlaceOnMap,
   renderProjectsWithinPlaceOnMap,
 } from "./render_utils.ts";
 import {
@@ -35,7 +35,7 @@ class PageHome extends HTMLElement {
 
   map: Map | null = null;
   projectLayer: GeoJSON | undefined = undefined;
-  projectsWithinPlace: Circle[] = [];
+  projectsWithinPlace: Marker[] = [];
   newProjectEl: HTMLButtonElement | null = null;
   yearSelectEl: HTMLSelectElement | null = null;
   searchInputEl: HTMLInputElement | null = null;
@@ -51,17 +51,21 @@ class PageHome extends HTMLElement {
 
     this.newProjectEl?.addEventListener("click", this);
     this.yearSelectEl?.addEventListener("change", this);
-    window.addEventListener("loadNewProject", this);
-    window.addEventListener("loadThisProject", this);
     this.searchInputEl?.addEventListener("selection", this);
+
+    window.addEventListener("loadRandomProject", this);
+    window.addEventListener("loadThisProject", this);
+    window.addEventListener("placeRemoved", this);
   }
 
   disconnectedCallback() {
     this.newProjectEl?.removeEventListener("click", this);
     this.yearSelectEl?.removeEventListener("change", this);
-    window.removeEventListener("loadNewProject", this);
+    this.searchInputEl?.removeEventListener("selection", this);
+
+    window.removeEventListener("loadRandomProject", this);
     window.removeEventListener("loadThisProject", this);
-    window.removeEventListener("selection", this);
+    window.removeEventListener("placeRemoved", this);
 
     this.removeMapLayers(window.app.store);
     removeMap(window.app.store);
@@ -79,12 +83,17 @@ class PageHome extends HTMLElement {
       }
     }
 
-    if (event.type === "loadNewProject") {
+    if (event.type === "loadRandomProject") {
       this.newRandomProjectHandler(appStore);
-    }
-
-    if (event.type === "loadThisProject") {
+    } else if (event.type === "loadThisProject") {
       this.newProjectByIdHandler(event.detail.project_id, appStore);
+    } else if (event.type === "placeRemoved") {
+      this.projectsWithinPlace.forEach((marker) => marker.remove());
+      updateAppUrl(window.location, appStore);
+      renderSelectedResources(appStore, this);
+      if (this.searchInputEl) {
+        this.searchInputEl.value = "";
+      }
     }
 
     if (event.type === "change") {
@@ -100,6 +109,7 @@ class PageHome extends HTMLElement {
       }
     }
 
+    // when search place is selected
     if (event.type === "selection") {
       let place = event.detail.selection.value;
       // add place to store and map
@@ -127,14 +137,14 @@ class PageHome extends HTMLElement {
     initFilters(appStore, this);
 
     // render places
-    renderSelectedPlaces(appStore);
+    renderPlaceOnMap(appStore);
 
     // render project
     let layer = await renderProjectOnMap(appStore);
     if (layer) {
       this.projectLayer = layer;
     }
-    renderSelectedProject(selectedProject, this);
+    renderSelectedResources(appStore, this);
 
     // render projects within place
     let markers = renderProjectsWithinPlaceOnMap(appStore);

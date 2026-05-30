@@ -6,6 +6,7 @@ import type {
   AppStoreType,
   CircleSettings,
   GeoJSONSettings,
+  MarkerSettings,
   ObservationTilesSettingType,
 } from "../types/app";
 
@@ -281,8 +282,8 @@ export function fitBounds(layer: GeoJSON, map: Map) {
   map.fitBounds(L.featureGroup([layer]).getBounds(), { maxZoom: 6 });
 }
 
-export function renderMarker(lat: number, lon: number, map: Map) {
-  return L.marker([lat, lon]).addTo(map);
+export function renderMarker(settings: MarkerSettings, map: Map) {
+  return L.marker([settings.latitude, settings.longitude]).addTo(map);
 }
 
 export function renderGeojsonLayer(

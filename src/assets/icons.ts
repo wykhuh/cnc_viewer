@@ -13,3 +13,4 @@ export const rightBigIcon = "&#10095;";
 export const rightDoubleIcon = "&#187;";
 export const rightIcon = "&#8250;";
 export const expandIcon = "&#10530;";
+export const xIcon = "&#215;";
