@@ -56,7 +56,7 @@ describe("formatAppParams", () => {
 
     let result = formatAppParams(store);
 
-    expect(result).toBe(`project_id=${projectDemo.slug}`);
+    expect(result).toBe(`project_id=${projectDemo.id}`);
   });
 
   test("returns place_id if store has place", () => {

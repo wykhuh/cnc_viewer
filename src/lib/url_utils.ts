@@ -24,7 +24,7 @@ export function formatAppParams(appStore: AppStoreType) {
   let params = new URLSearchParams();
 
   if (appStore.selectedProject) {
-    params.set("project_id", appStore.selectedProject.slug);
+    params.set("project_id", appStore.selectedProject.id.toString());
   }
   if (appStore.selectedPlaces) {
     params.set("place_id", appStore.selectedPlaces.id.toString());
