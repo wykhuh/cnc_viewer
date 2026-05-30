@@ -427,8 +427,6 @@
 
   .project-map-popup,
   .project-list-item {
-    display: flex;
-
     img {
       margin-right: 5px;
     }
@@ -444,9 +442,13 @@
   }
 
   .project-map-popup {
-    h2 {
-      font-size: 1rem;
+    button {
+      margin-top: 0.5rem;
     }
+  }
+
+  .leaflet-popup-content {
+    margin: 10px 20px 10px 15px !important;
   }
 
   #projects-list {

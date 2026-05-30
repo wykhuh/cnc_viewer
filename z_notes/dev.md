@@ -29,3 +29,8 @@ parseInt(value) // -5 -5 -5
 https://www.smashingmagazine.com/2023/02/guide-building-accessible-carousels/
 
 A Step-By-Step Guide To Building Accessible Carousels
+
+==
+Attach click function to the button inside a popup in Leaflet?
+
+https://gis.stackexchange.com/a/447345

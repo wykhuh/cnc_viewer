@@ -1,5 +1,5 @@
 import L from "leaflet";
-import type { GeoJSON, Layer, Map } from "leaflet";
+import type { GeoJSON, Map } from "leaflet";
 
 import { loggerUrl } from "./logger.ts";
 import type {
@@ -289,24 +289,20 @@ export function renderGeojsonLayer(
   settings: GeoJSONSettings,
   map: Map,
 ): GeoJSON {
-  function onEachFeature(feature: any, layer: Layer) {
-    if (feature.properties && feature.properties.popupContent) {
-      layer.bindPopup(feature.properties.popupContent);
-    }
-  }
   let options: any = {
     color: settings.color,
     fillColor: settings.fillColor,
     fillOpacity:
       settings.fillOpacity === undefined ? 0.2 : settings.fillOpacity,
-    onEachFeature: onEachFeature,
   };
+  // make geojson not clickable
+  // https://stackoverflow.com/a/58675812
+  if (settings.interactive === false || settings.interactive === true) {
+    options.style = { interactive: settings.interactive };
+  }
 
   var geojsonFeature: any = {
     type: "Feature",
-    properties: {
-      popupContent: settings.popupContent,
-    },
     geometry: settings.geometry,
   };
 

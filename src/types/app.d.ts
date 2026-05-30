@@ -131,7 +131,7 @@ interface LeafletOptions {
 
 export interface GeoJSONSettings extends LeafletOptions {
   geometry: MultiPolygonJson | PolygonJson;
-  popupContent?: string;
+  interactive?: boolean;
 }
 
 export interface CircleSettings extends LeafletOptions {

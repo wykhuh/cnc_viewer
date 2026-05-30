@@ -17,6 +17,7 @@ import {
   loadProjectsCsv,
   selectRandomProject,
   projectsWithinPlaceHandler,
+  selectProjectById,
 } from "./data_utils.ts";
 import { updateAppUrl } from "../../lib/url_utils.ts";
 import { throttledFetch } from "../../lib/utils.ts";
@@ -33,7 +34,6 @@ class PageHome extends HTMLElement {
   }
 
   map: Map | null = null;
-  placeLayer: GeoJSON | undefined = undefined;
   projectLayer: GeoJSON | undefined = undefined;
   projectsWithinPlace: Circle[] = [];
   newProjectEl: HTMLButtonElement | null = null;
@@ -52,6 +52,7 @@ class PageHome extends HTMLElement {
     this.newProjectEl?.addEventListener("click", this);
     this.yearSelectEl?.addEventListener("change", this);
     window.addEventListener("loadNewProject", this);
+    window.addEventListener("loadThisProject", this);
     this.searchInputEl?.addEventListener("selection", this);
   }
 
@@ -59,8 +60,10 @@ class PageHome extends HTMLElement {
     this.newProjectEl?.removeEventListener("click", this);
     this.yearSelectEl?.removeEventListener("change", this);
     window.removeEventListener("loadNewProject", this);
+    window.removeEventListener("loadThisProject", this);
     window.removeEventListener("selection", this);
-    this.removeMapLayers();
+
+    this.removeMapLayers(window.app.store);
     removeMap(window.app.store);
   }
 
@@ -72,12 +75,16 @@ class PageHome extends HTMLElement {
 
     if (event.type === "click") {
       if (target.id === "new-project") {
-        this.newProjectHandler(appStore);
+        this.newRandomProjectHandler(appStore);
       }
     }
 
     if (event.type === "loadNewProject") {
-      this.newProjectHandler(appStore);
+      this.newRandomProjectHandler(appStore);
+    }
+
+    if (event.type === "loadThisProject") {
+      this.newProjectByIdHandler(event.detail.project_id, appStore);
     }
 
     if (event.type === "change") {
@@ -87,7 +94,7 @@ class PageHome extends HTMLElement {
         let year = Number(target.value);
         appStore.currentYear = year;
         loadProjectsCsv(year, appStore).then(() => {
-          this.newProjectHandler(appStore);
+          this.newRandomProjectHandler(appStore);
           spinner.stop();
         });
       }
@@ -101,7 +108,7 @@ class PageHome extends HTMLElement {
       // add projects within place to store and map, rerender caroseul,
       projectsWithinPlaceHandler(place, appStore);
       if (appStore.data.projectsForPlace) {
-        this.newProjectHandler(appStore);
+        this.newRandomProjectHandler(appStore);
       }
     }
   }
@@ -120,10 +127,7 @@ class PageHome extends HTMLElement {
     initFilters(appStore, this);
 
     // render places
-    let placeLayer = renderSelectedPlaces(appStore);
-    if (placeLayer) {
-      this.placeLayer = placeLayer;
-    }
+    renderSelectedPlaces(appStore);
 
     // render project
     let layer = await renderProjectOnMap(appStore);
@@ -147,7 +151,7 @@ class PageHome extends HTMLElement {
     }
   }
 
-  newProjectHandler(appStore: AppStoreType) {
+  newRandomProjectHandler(appStore: AppStoreType) {
     // cancel existing fetch observations for previous project
     throttledFetch.cancel();
     // pick new project
@@ -155,14 +159,27 @@ class PageHome extends HTMLElement {
     // update url
     updateAppUrl(window.location, appStore);
     // update UI
-    this.removeMapLayers();
+    this.removeMapLayers(appStore);
     this.render(appStore);
   }
 
-  removeMapLayers() {
+  newProjectByIdHandler(id: number, appStore: AppStoreType) {
+    // cancel existing fetch observations for previous project
+    throttledFetch.cancel();
+    // pick new project
+    appStore.selectedProject = selectProjectById(id, appStore);
+
+    // update url
+    updateAppUrl(window.location, appStore);
+    // update UI
+    this.removeMapLayers(appStore);
+    this.render(appStore);
+  }
+
+  removeMapLayers(appStore: AppStoreType) {
     this.projectsWithinPlace.forEach((marker) => marker.remove());
     this.projectLayer?.remove();
-    this.placeLayer?.remove();
+    appStore.placesMapLayers?.remove();
   }
 }
 

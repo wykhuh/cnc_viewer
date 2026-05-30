@@ -63,13 +63,12 @@ export async function renderProjectOnMap(appStore: AppStoreType) {
 
   if (geometry) {
     let layer = renderGeojsonLayer(
-      {
-        geometry: geometry,
-        popupContent: formatProjectDisplay(project, "project-map-popup"),
-        color: "green",
-      },
+      { geometry: geometry, color: "green" },
       appStore.map,
     );
+    layer.bindPopup(formatProjectMapPopup(project, false), {
+      maxWidth: 200,
+    });
     fitBounds(layer, appStore.map);
 
     return layer;
@@ -83,42 +82,87 @@ export function renderProjectsWithinPlaceOnMap(appStore: AppStoreType) {
   if (!projects) return;
 
   let markers: Circle[] = [];
-  projects.forEach((project) => {
-    let marker = renderCircleMarker(
-      {
-        latitude: project.latitude,
-        longitude: project.longitude,
-        color: "red",
-      },
-      map,
-    );
-    marker.bindPopup(formatProjectDisplay(project, "project-map-popup"));
-    markers.push(marker);
-  });
+  projects
+    // don't draw circle marker for selected project
+    .filter((p) => p.id !== appStore.selectedProject?.id)
+    .forEach((project) => {
+      let marker = renderCircleMarker(
+        {
+          latitude: project.latitude,
+          longitude: project.longitude,
+          color: "#555",
+          radius: 5000,
+        },
+        map,
+      );
+      marker.bindPopup(formatProjectMapPopup(project, true), {
+        maxWidth: 200,
+      });
+      markers.push(marker);
+    });
 
   return markers;
 }
 
-function formatProjectDisplay(
+function formatProjectDisplay(project: Project, titleTag: string) {
+  let content = "";
+
+  let link = `<a href="${iNatProjectsUrl}/${project.id}">${project.title}</a>`;
+  if (titleTag === "div") {
+    content += `<div>${link}</div>`;
+  } else {
+    content += `<h2>${link}</h2>`;
+  }
+  content += `
+  <dl>
+    <div>
+      <dt>Place:</dt>
+      <dd>
+        &nbsp;<a href="${iNatPlacesUrl}/${project.place_id}"
+          >${project.place_display_name}</a
+        >
+      </dd>
+    </div>
+  </dl>`;
+  return content;
+}
+
+function formatProjectMapPopup(project: Project, includeButton = false) {
+  let container = document.createElement("div");
+  container.className = "project-map-popup";
+  container.innerHTML = formatProjectDisplay(project, "div");
+
+  if (includeButton) {
+    let button = document.createElement("button");
+    button.textContent = "Select this project";
+    button.className = "btn-primary";
+    button.addEventListener("click", () => {
+      window.dispatchEvent(
+        new CustomEvent("loadThisProject", {
+          detail: {
+            project_id: project.id,
+          },
+        }),
+      );
+    });
+    container.append(button);
+  }
+
+  return container;
+}
+
+export function renderSelectedProject(
   project: Project,
-  className: string,
-  titleTag = "div",
+  componentCtx: HTMLElement,
 ) {
-  return `<div class="${className}">
-        <div>
-          <${titleTag}><a href="${iNatProjectsUrl}/${project.id}">${project.title}</a></${titleTag}>
-          <dl>
-            <div>
-              <dt>Place:</dt>
-              <dd>
-                &nbsp;<a href="${iNatPlacesUrl}/${project.place_id}"
-                  >${project.place_display_name}</a
-                >
-              </dd>
-            </div>
-          </dl>
-        </div>
-      </div>`;
+  let containerEl = componentCtx.querySelector("#projects-list");
+  if (!containerEl) return;
+  containerEl.innerHTML = "";
+
+  let itemEl = document.createElement("div");
+  itemEl.className = "project-list-item";
+  itemEl.innerHTML = formatProjectDisplay(project, "h2");
+  containerEl.appendChild(itemEl);
 }
 
 export function renderEcoregions(ecoregions: GeoJsonObject, map: Map) {
@@ -131,20 +175,6 @@ export function renderEcoregions(ecoregions: GeoJsonObject, map: Map) {
   L.geoJSON(ecoregions, {
     onEachFeature: onEachFeature,
   }).addTo(map);
-}
-
-export function renderSelectedProject(
-  project: Project,
-  componentCtx: HTMLElement,
-) {
-  let containerEl = componentCtx.querySelector("#projects-list");
-  if (!containerEl) return;
-  containerEl.innerHTML = "";
-
-  let itemEl = document.createElement("div");
-  let content = formatProjectDisplay(project, "project-list-item", "h2");
-  itemEl.innerHTML = content;
-  containerEl.appendChild(itemEl);
 }
 
 export function initFilters(appStore: AppStoreType, componentCtx: any) {
@@ -167,6 +197,7 @@ export function renderSelectedPlaces(appStore: AppStoreType) {
       geometry: appStore.selectedPlaces.geometry,
       color: "blue",
       fillOpacity: 0,
+      interactive: false,
     },
     appStore.map,
   );
