@@ -6,16 +6,11 @@ import type {
 import { loggerUrl } from "./logger.ts";
 import { throttledFetch } from "./utils.ts";
 
-export const api_base = "https://api.inaturalist.org/v1/";
-const search_api = "https://api.inaturalist.org/v1/search";
-export const autocomplete_places_api = `${search_api}?sources=places`;
-export const autocomplete_projects_api = `https://api.inaturalist.org/v1/projects/autocomplete?`;
-export const autocomplete_users_api = `https://api.inaturalist.org/v1/users/autocomplete?order=activity`;
-export const autocomplete_taxa_api =
-  "https://api.inaturalist.org/v1/taxa/autocomplete?";
-export const autocomplete_observation_fields_api = `https://api.inaturalist.org/v1/observation_fields/autocomplete?`;
-const observations_api_v2 = "https://api.inaturalist.org/v2/observations";
-const places_api_v2 = "https://api.inaturalist.org/v2/places";
+const search_api = "https://api.inaturalist.org/v2/search";
+export const autocomplete_places_api = `${search_api}?fields=all&sources=places`;
+export const autocomplete_projects_api = `${search_api}?fields=all&sources=projects`;
+const observations_api = "https://api.inaturalist.org/v2/observations";
+const places_api = "https://api.inaturalist.org/v2/places";
 
 export async function inatFetch(url: string, funcName: string) {
   try {
@@ -49,7 +44,7 @@ export async function getObservationsBasic(appParams: string) {
     "license_code:!t," +
     "taxon:(name:!t,preferred_common_name:!t,rank:!t)," +
     "photos:(id:!t,url:!t,attribution:!t,license_code:!t))";
-  let url = `${observations_api_v2}?${appParams}` + `&fields=${fields}`;
+  let url = `${observations_api}?${appParams}` + `&fields=${fields}`;
   let data = (await inatFetch(
     url,
     "getObservationPhoto",
@@ -69,7 +64,7 @@ export async function getObservationsSpeciesBasic(appParams: string) {
     "preferred_common_name:!t," +
     "rank:!t))";
   let url =
-    `${observations_api_v2}/species_counts?${appParams}&ttl=3600` +
+    `${observations_api}/species_counts?${appParams}&ttl=3600` +
     `&fields=${fields}`;
   let data = (await inatFetch(
     url,
@@ -103,7 +98,7 @@ export async function getPlaceById(id: number | string) {
   let fields =
     "(bounding_box_geojson:!t,display_name:!t,geometry_geojson:!t,name:!t,place_type:!t)";
   let data = (await inatFetch(
-    `${places_api_v2}/${id}?fields=${fields}`,
+    `${places_api}/${id}?fields=${fields}`,
     "getPlaceById",
   )) as iNatPlacesAPI;
   if (data) {

@@ -6,7 +6,7 @@ import type {
   NormalizedPlace,
 } from "../types/app.d.ts";
 import { getAutocompletePlaces } from "../lib/inat_api.ts";
-import type { iNatSearchAPI } from "../types/inat_api";
+import type { iNatSearchAPI, PlaceSearchRecord } from "../types/inat_api";
 import { fitBoundsPlaces, renderGeojsonLayer } from "./map_utils.ts";
 import { normalizePlaceResult } from "../components/PageHome/data_utils.ts";
 
@@ -49,7 +49,7 @@ export function processAutocompletePlaces(
   data: iNatSearchAPI,
 ): NormalizedPlace[] {
   return data.results.map((item) => {
-    return normalizePlaceResult(item.record);
+    return normalizePlaceResult(item.place as PlaceSearchRecord);
   });
 }
 

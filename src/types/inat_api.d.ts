@@ -62,12 +62,13 @@ export interface iNatSearchAPI {
 
 export interface SearchResult {
   matches: string[];
-  record: SearchRecord;
+  place?: PlaceSearchRecord;
+  project?: ProjectSearchRecord;
   score: number;
   type: string;
 }
 
-export interface SearchRecord {
+export interface PlaceSearchRecord {
   admin_level: number | null;
   ancestor_place_ids: number[] | null;
   bbox_area: number;
@@ -79,7 +80,6 @@ export interface SearchRecord {
   location: string;
   matched_term: string;
   name: string;
-  names: string[];
   observations_count: number;
   place_type: number | null;
   point_geojson: Point;
@@ -89,6 +89,83 @@ export interface SearchRecord {
   uuid: string;
   without_check_list: boolean | null;
 }
+
+export interface ProjectSearchRecord {
+  id: number;
+  admins: Admin[];
+  banner_color: null | string;
+  created_at: string;
+  delegated_project_id: null | number;
+  description: string;
+  flags: [];
+  header_image_contain: boolean;
+  header_image_file_name: string;
+  header_image_url: string;
+  hide_leaderboard: boolean;
+  hide_title: boolean;
+  icon: string;
+  icon_file_name: string;
+  is_delegated_umbrella: boolean;
+  is_umbrella: boolean;
+  latitude: string;
+  location: string;
+  longitude: string;
+  membership_model: string;
+  observation_requirements_updated_at: null | string;
+  place_id: number;
+  prefers_user_trust: boolean;
+  project_observation_fields: ProjectObservationFields[];
+  project_observation_rules: ProjectObservationRules[];
+  project_type: "";
+  rule_preferences: RulePreferences[];
+  search_parameters: SearchParameters[];
+  site_features: [];
+  slug: string;
+  terms: string;
+  title: string;
+  updated_at: string;
+  user_id: number;
+  user_ids: number[];
+}
+
+type ProjectObservationFields = {
+  id: number;
+  observation_field: {
+    id: number;
+    allowed_values: string;
+    datatype: string;
+    description: string;
+    description_autocomplete: string;
+    name: string;
+    name_autocomplete: string;
+    users_count: number;
+    values_count: number;
+  };
+  position: number;
+  required: boolean;
+};
+
+type ProjectObservationRules = {
+  id: number;
+  operand_id: number;
+  operand_type: string;
+  operator: string;
+};
+
+type RulePreferences = { field: string; value: string };
+
+type SearchParameters = {
+  field: string;
+  value: number[] | string[];
+  value_keyword?: string[];
+};
+
+type Admin = {
+  id: number;
+  project_id: number;
+  role: "manager" | "curator";
+  user_id: number;
+};
 
 export interface UserBasic {
   created_at: string;

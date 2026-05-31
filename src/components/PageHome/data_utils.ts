@@ -17,7 +17,7 @@ import type {
   BasicTaxon,
   iNatObservationsBasicAPI,
   PlaceResult,
-  SearchRecord,
+  PlaceSearchRecord,
 } from "../../types/inat_api";
 import pointsWithinPolygon from "@turf/points-within-polygon";
 
@@ -140,7 +140,7 @@ export function cleanupProjectsCSV(projects: any[]): Project[] {
     });
 }
 
-export function normalizePlaceResult(record: SearchRecord | PlaceResult) {
+export function normalizePlaceResult(record: PlaceSearchRecord | PlaceResult) {
   let typeName;
   if (record.place_type) {
     typeName = placeTypes[record.place_type.toString() as PlaceTypesKey];
