@@ -1,5 +1,7 @@
+import { playIcon } from "../../assets/icons";
 import { setupComponent } from "../../lib/component_utils";
-import { template } from "./template";
+// @ts-ignore
+import template from "./template.md";
 
 class PageAbout extends HTMLElement {
   constructor() {
@@ -12,3 +14,14 @@ class PageAbout extends HTMLElement {
 }
 
 customElements.define("page-about", PageAbout);
+
+class IconPlay extends HTMLElement {
+  constructor() {
+    super();
+  }
+  connectedCallback() {
+    this.innerHTML = playIcon;
+  }
+}
+
+customElements.define("icon-play", IconPlay);
