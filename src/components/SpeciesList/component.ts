@@ -1,5 +1,6 @@
 import { pauseIcon, playIcon } from "../../assets/icons";
 import { html, setupComponent } from "../../lib/component_utils";
+import { createSpinner } from "../../lib/spinner";
 import { toggleFullScreen } from "../../lib/utils";
 import type { AppStoreType } from "../../types/app";
 import {
@@ -13,12 +14,13 @@ import {
   setCurrentTaxon,
 } from "./utils";
 
-const template = html`<div
-  id="carousel"
-  role="region"
-  aria-roledescription="carousel"
-  aria-label="Species List"
-></div>`;
+const template = html` <span class="species-loader loader"></span>
+  <div
+    id="carousel"
+    role="region"
+    aria-roledescription="carousel"
+    aria-label="Species List"
+  ></div>`;
 
 class SpeciesList extends HTMLElement {
   constructor() {
@@ -130,6 +132,9 @@ class SpeciesList extends HTMLElement {
       }
     }
 
+    let spinner = createSpinner(".species-loader");
+    spinner.start();
+
     // get list of taxa
     let taxa = await fetchSpecies(project);
     if (!taxa) return;
@@ -158,6 +163,8 @@ class SpeciesList extends HTMLElement {
       this.innerText = "No records found";
       return;
     }
+
+    spinner.stop();
 
     renderCarousel(appStore, this);
 

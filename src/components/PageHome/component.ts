@@ -21,7 +21,6 @@ import {
 } from "./data_utils.ts";
 import { updateAppUrl } from "../../lib/url_utils.ts";
 import { throttledFetch } from "../../lib/utils.ts";
-import { createSpinner } from "../../lib/spinner.ts";
 import {
   placeSelectedHandler,
   setupPlacesSearch,
@@ -98,13 +97,10 @@ class PageHome extends HTMLElement {
 
     if (event.type === "change") {
       if (target.id === "year-select") {
-        let spinner = createSpinner(".project-loader");
-        spinner.start();
         let year = Number(target.value);
         appStore.currentYear = year;
         loadProjectsCsv(year, appStore).then(() => {
           this.newRandomProjectHandler(appStore);
-          spinner.stop();
         });
       }
     }
