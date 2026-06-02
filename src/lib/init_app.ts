@@ -52,3 +52,33 @@ export async function initApp(
   // save page to store
   appStore.currentPage = getAppPage(pathname);
 }
+
+export async function registerServiceWorker() {
+  // register service worker
+  if ("serviceWorker" in navigator) {
+    try {
+      await navigator.serviceWorker.register("/service_worker.js");
+      console.log("service worker register");
+    } catch (err) {
+      console.log("service worker not register", err);
+    }
+
+    //listen for messages from the service worker
+    navigator.serviceWorker.addEventListener(
+      "message",
+      onMessageFromServiceWorker,
+    );
+  } else {
+    console.log("Service workers are not supported.");
+  }
+}
+
+function onMessageFromServiceWorker(event: MessageEvent) {
+  console.log("Message from service worker:", event.data);
+}
+
+export function sendMessageToServiceWorker(message: any) {
+  if (navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage(message);
+  }
+}

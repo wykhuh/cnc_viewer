@@ -20,12 +20,12 @@ import {
   selectProjectById,
 } from "./data_utils.ts";
 import { updateAppUrl } from "../../lib/url_utils.ts";
-import { throttledFetch } from "../../lib/utils.ts";
 import {
   placeSelectedHandler,
   setupPlacesSearch,
 } from "../../lib/search_places.ts";
 import { removeMap } from "../../lib/map_utils.ts";
+import { sendMessageToServiceWorker } from "../../lib/init_app.ts";
 
 class PageHome extends HTMLElement {
   constructor() {
@@ -159,7 +159,7 @@ class PageHome extends HTMLElement {
 
   newRandomProjectHandler(appStore: AppStoreType) {
     // cancel existing fetch observations for previous project
-    throttledFetch.cancel();
+    sendMessageToServiceWorker("cancel_fetch");
     // pick new project
     appStore.selectedProject = selectRandomProject(appStore);
     // update url
@@ -171,7 +171,8 @@ class PageHome extends HTMLElement {
 
   newProjectByIdHandler(id: number, appStore: AppStoreType) {
     // cancel existing fetch observations for previous project
-    throttledFetch.cancel();
+    sendMessageToServiceWorker("cancel_fetch");
+
     // pick new project
     appStore.selectedProject = selectProjectById(id, appStore);
 

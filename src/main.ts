@@ -6,10 +6,12 @@ import "./components/SelectedPlace/component.ts";
 import "./components/SelectedProject/component.ts";
 
 import store from "./lib/store.ts";
-import { initApp } from "./lib/init_app.ts";
+import { initApp, registerServiceWorker } from "./lib/init_app.ts";
 import { updateAppUrl } from "./lib/url_utils.ts";
 import Router from "./lib/router.ts";
 import { selectProjectById } from "./components/PageHome/data_utils.ts";
+
+await registerServiceWorker();
 
 window.app = { store: store, router: Router };
 
