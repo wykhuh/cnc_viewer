@@ -1,4 +1,4 @@
-importScripts("./service_worker_utils.js");
+import { throttleAsync, logger } from "./service_worker_utils";
 
 const version = 1.0;
 const cacheName = `cnc_viewer_${version}`;

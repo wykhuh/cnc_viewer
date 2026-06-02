@@ -1,4 +1,4 @@
-function throttleAsync(func, delayMS) {
+export function throttleAsync(func, delayMS) {
   let lastRun = 0;
   let timeouts = [];
 
@@ -36,6 +36,6 @@ function throttleAsync(func, delayMS) {
   return throttled;
 }
 
-function logger(...text) {
+export function logger(...text) {
   console.log(...text);
 }

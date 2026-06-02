@@ -12,11 +12,8 @@ export default defineConfig({
       },
       output: {
         entryFileNames: (assetInfo) => {
-          console.log(assetInfo.name);
-          if (assetInfo.name === "service_worker") {
-            return "service_worker.js";
-          } else if (assetInfo.name === "service_worker_utils") {
-            return "service_worker_utils.js";
+          if (assetInfo.name.startsWith("service_worker")) {
+            return "[name].js";
           } else {
             return "assets/[name]-[hash].js";
           }

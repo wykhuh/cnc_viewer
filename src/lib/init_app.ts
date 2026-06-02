@@ -57,7 +57,9 @@ export async function registerServiceWorker() {
   // register service worker
   if ("serviceWorker" in navigator) {
     try {
-      await navigator.serviceWorker.register("/service_worker.js");
+      await navigator.serviceWorker.register("/service_worker.js", {
+        type: "module",
+      });
       console.log("service worker register");
     } catch (err) {
       console.log("service worker not register", err);
