@@ -10,6 +10,10 @@ City Nature Challenge Viewer is a open-source website that displays the species 
 
 ## Instructions
 
+Three minute demostration of this site.
+
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/afNm1C-vArQ?si=97QDcghUBMUbAA4D" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
 ### Select project
 
 By default, this site will display a randomly selected CNC project. The project area will been shown in green on the map. To select another project, click "Select new project".
@@ -44,6 +48,6 @@ I did not use AI prompts or vibe coding to build this site.
 
 ### Links
 
-- [Github Repo](https://github.com/wykhuh/cnc-viewer)
+- [Github Repo](https://github.com/wykhuh/cnc_viewer)
 
 </main>
