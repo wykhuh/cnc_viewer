@@ -11,6 +11,12 @@ import {
 } from "../../lib/map_utils";
 import { iNatProjectsUrl } from "../../data/inat_data";
 import { getPlaceById } from "../../lib/inat_api";
+// import leaflet markers so that markers are included in vite build
+// https://github.com/vitejs/vite-plugin-vue/discussions/104
+// https://cescobaz.com/2023/06/14/setup-leaflet-with-svelte-and-vite/
+import markerIconUrl from "leaflet/dist/images/marker-icon.png";
+import markerIconRetinaUrl from "leaflet/dist/images/marker-icon-2x.png";
+import markerShadowUrl from "leaflet/dist/images/marker-shadow.png";
 
 export function renderMap() {
   let map = L.map("map", {
@@ -18,6 +24,11 @@ export function renderMap() {
     zoom: 0,
   });
   map.zoomControl.setPosition("bottomright");
+  L.Icon.Default.prototype.options.iconUrl = markerIconUrl;
+  L.Icon.Default.prototype.options.iconRetinaUrl = markerIconRetinaUrl;
+  L.Icon.Default.prototype.options.shadowUrl = markerShadowUrl;
+  // necessary to avoid Leaflet adds some prefix to image path.
+  L.Icon.Default.imagePath = "";
 
   // add basemaps
   let { OpenStreetMap } = getMapTiles();
