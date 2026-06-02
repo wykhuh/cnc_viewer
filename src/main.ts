@@ -7,7 +7,6 @@ import "./components/SelectedProject/component.ts";
 
 import store from "./lib/store.ts";
 import { initApp, registerServiceWorker } from "./lib/init_app.ts";
-import { updateAppUrl } from "./lib/url_utils.ts";
 import Router from "./lib/router.ts";
 import { selectProjectById } from "./components/PageHome/data_utils.ts";
 
@@ -32,7 +31,5 @@ window.addEventListener("popstate", (event) => {
   );
   Router.go(event.state.pathname);
 });
-
-updateAppUrl(window.location, window.app.store);
 
 // TODO: allow users to set verifiable, quality_grade
