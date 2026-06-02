@@ -34,3 +34,24 @@ A Step-By-Step Guide To Building Accessible Carousels
 Attach click function to the button inside a popup in Leaflet?
 
 https://gis.stackexchange.com/a/447345
+
+==
+
+deploy
+
+https://developers.cloudflare.com/pages/get-started/direct-upload/
+
+npm i -D wrangler@latest
+
+npx wrangler --version
+
+npx wrangler login
+
+npx wrangler pages project create xxx
+
+npx wrangler pages deploy dist
+
+to change project name:
+npx wrangler pages deploy <directory> --project-name=xxx
+
+==

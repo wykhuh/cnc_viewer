@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "deploy": "npm run build & npx wrangler pages deploy dist",
     "preview": "vite preview",
     "type": "tsc",
     "test_watch": "vitest --mode test",
@@ -19,7 +20,8 @@
     "msw": "^2.14.6",
     "typescript": "~6.0.2",
     "vite": "^8.0.12",
-    "vitest": "^4.1.6"
+    "vitest": "^4.1.6",
+    "wrangler": "^4.94.0"
   },
   "dependencies": {
     "@tarekraafat/autocomplete.js": "^10.2.10",
